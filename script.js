@@ -7,7 +7,173 @@ document.addEventListener('DOMContentLoaded', () => {
     initInteractiveGradient();
     initLiquidGlassNav();
     initSectionNavigation();
+    initLanguageSwitcher();
 });
+
+/**
+ * Language Switcher
+ * Toggles between RU and EN flags
+ */
+function initLanguageSwitcher() {
+    const langBtn = document.querySelector('.lang-btn');
+    const langIcon = document.querySelector('.lang-icon');
+    let currentLang = 'en'; // Start in English (so we show RU switch option)
+
+    // Translation Dictionary
+    const translations = {
+        en: {
+            "hero.line1": "Creative",
+            "hero.line2": "visual",
+            "hero.line3": "designer",
+            "hero.role": "WEB & MOBILE / UX&UI / BRANDING",
+            "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
+            "hero.based.label": "BASED",
+            "hero.based.city": "IN LONDON",
+            "works.title": "Selected Works",
+            "works.1.title": "Brand Identity",
+            "works.1.desc": "Complete visual identity for tech startup",
+            "works.2.title": "Mobile App",
+            "works.2.desc": "iOS & Android wellness application",
+            "works.3.title": "Web Platform",
+            "works.3.desc": "E-commerce experience redesign",
+            "about.title": "About Me",
+            "about.text": "I'm a creative visual designer with over 8 years of experience crafting digital experiences that blend aesthetics with functionality. My passion lies in creating designs that not only look beautiful but also tell compelling stories.",
+            "skills.1": "UI/UX Design",
+            "skills.2": "Brand Identity",
+            "skills.3": "Motion Design",
+            "skills.4": "Prototyping",
+            "skills.5": "Design Systems",
+            "contact.title": "Get in Touch",
+            "contact.text": "Ready to bring your vision to life? Let's create something amazing together.",
+            "nav.works": "Works",
+            "nav.about": "About",
+            "nav.contact": "Contact"
+        },
+        ru: {
+            "hero.line1": "Креативный",
+            "hero.line2": "визуальный",
+            "hero.line3": "дизайнер",
+            "hero.role": "ВЕБ & МОБАЙЛ / UX&UI / БРЕНДИНГ",
+            "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
+            "hero.based.label": "ЛОКАЦИЯ",
+            "hero.based.city": "ЛОНДОН",
+            "works.title": "Избранные проекты",
+            "works.1.title": "Айдентика бренда",
+            "works.1.desc": "Полный визуальный стиль для стартапа",
+            "works.2.title": "Мобильное приложение",
+            "works.2.desc": "iOS & Android приложение для здоровья",
+            "works.3.title": "Веб-платформа",
+            "works.3.desc": "Редизайн e-commerce опыта",
+            "about.title": "Обо мне",
+            "about.text": "Я креативный дизайнер с более чем 8-летним опытом создания цифровых продуктов, сочетающих эстетику и функциональность. Моя страсть — создавать дизайн, который не только красив, но и рассказывает историю.",
+            "skills.1": "UI/UX Дизайн",
+            "skills.2": "Брендинг",
+            "skills.3": "Моушн-дизайн",
+            "skills.4": "Прототипирование",
+            "skills.5": "Дизайн-системы",
+            "contact.title": "Связаться",
+            "contact.text": "Готовы воплотить идеи в жизнь? Давайте создадим что-то удивительное вместе.",
+            "nav.works": "Работы",
+            "nav.about": "Инфо",
+            "nav.contact": "Контакты"
+        }
+    };
+
+    const ruFlag = `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="12" fill="#F5F5F5"/>
+            <path d="M24 16C24 20.4183 20.4183 24 16 24H8C3.58172 24 0 20.4183 0 16V16H24V16Z" fill="#D52B1E"/>
+            <path d="M24 8H0V16H24V8Z" fill="#0039A6"/>
+            <path d="M0 8C0 3.58172 3.58172 0 8 0H16C20.4183 0 24 3.58172 24 8V8H0V8Z" fill="white"/>
+        </svg>
+    `;
+
+    const enFlag = `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 50%;">
+            <defs>
+                <clipPath id="circle-clip">
+                    <rect width="24" height="24" rx="12"/>
+                </clipPath>
+            </defs>
+            <g clip-path="url(#circle-clip)">
+                <rect width="24" height="24" fill="#012169"/>
+                <path d="M0 0L24 24M24 0L0 24" stroke="white" stroke-width="4"/>
+                <path d="M0 0L24 24M24 0L0 24" stroke="#C8102E" stroke-width="2"/>
+                <path d="M12 0V24M0 12H24" stroke="white" stroke-width="6"/>
+                <path d="M12 0V24M0 12H24" stroke="#C8102E" stroke-width="3"/>
+            </g>
+        </svg>
+    `;
+
+    if (langBtn && langIcon) {
+        langBtn.addEventListener('click', () => {
+            // Add ripple/press effect
+            langBtn.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+                langBtn.style.transform = 'scale(1)';
+
+                // Toggle Language
+                const nextLang = currentLang === 'en' ? 'ru' : 'en';
+                currentLang = nextLang;
+
+                // Switch Icon with fade
+                langIcon.style.opacity = '0';
+                langIcon.style.transform = 'rotate(30deg) scale(0.8)';
+
+                setTimeout(() => {
+                    // If we are now in RU, show EN flag (to switch back)
+                    // If we are now in EN, show RU flag (to switch to)
+                    const showRuFlag = currentLang === 'en';
+                    langIcon.innerHTML = showRuFlag ? ruFlag : enFlag;
+
+                    langIcon.style.opacity = '1';
+                    langIcon.style.transform = 'rotate(0) scale(1)';
+                    langIcon.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }, 200);
+
+                // Translate Page Content
+                translateContent(currentLang);
+
+            }, 100);
+        });
+    }
+
+    function translateContent(lang) {
+        document.querySelectorAll('[data-i18n]').forEach((el, index) => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                // Stagger animations slightly for organic feel
+                const delay = index * 10;
+
+                setTimeout(() => {
+                    // Start Dissolve: Blur out, fade out, drift down slightly
+                    el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.filter = 'blur(10px)';
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(4px) scale(0.95)';
+
+                    setTimeout(() => {
+                        // Swap Content
+                        el.textContent = translations[lang][key];
+
+                        // Re-materialize: Sharpen, fade in, settle
+                        el.style.filter = 'blur(0px)';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0) scale(1)';
+
+                        // Force navigation indicator update
+                        if (key.startsWith('nav.')) {
+                            requestAnimationFrame(() => {
+                                window.dispatchEvent(new Event('resize'));
+                            });
+                        }
+                    }, 400);
+                }, delay);
+            }
+        });
+    }
+}
 
 /**
  * Interactive Gradient Background
@@ -148,69 +314,47 @@ function initLiquidGlassNav() {
     const indicator = document.querySelector('.nav-indicator');
     const navContainer = document.querySelector('.nav-container');
 
-    // Position indicator on initial active button
-    const activeBtn = document.querySelector('.nav-btn.active');
-    if (activeBtn) {
-        requestAnimationFrame(() => {
-            updateIndicator(activeBtn, false);
-        });
-    }
+    // INITIALIZATION:
+    // User wants slider hidden initially. content should be Hero (Main Page).
+    // Ensure no buttons are active visually initially, and indicator is hidden.
+    navBtns.forEach(b => b.classList.remove('active'));
+    indicator.style.opacity = '0';
 
     navBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             // Prevent rapid clicking
             if (btn.classList.contains('animating')) return;
 
-            // Remove active class from all buttons
+            const isAlreadyActive = btn.classList.contains('active');
+
+            // 1. Reset all buttons
             navBtns.forEach(b => b.classList.remove('active'));
 
-            // Add active class to clicked button
-            btn.classList.add('active');
-            btn.classList.add('animating');
+            // 2. Logic: Toggle
+            if (isAlreadyActive) {
+                // Return to Main Page (Hero)
+                indicator.style.opacity = '0'; // Hide slider
+                navigateToSection('hero');
+            } else {
+                // Activate new section
+                btn.classList.add('active');
+                btn.classList.add('animating');
 
-            // Animate indicator with spring physics
-            updateIndicator(btn, true);
-
-            // Add ripple effect
-            addRippleEffect(btn);
-
-            // Navigate to section
-            const sectionId = btn.dataset.section;
-            navigateToSection(sectionId);
-
-            // Remove animating class after animation completes
-            setTimeout(() => {
-                btn.classList.remove('animating');
-            }, 500);
-        });
-
-        // Hover effect - subtle indicator preview
-        btn.addEventListener('mouseenter', () => {
-            if (!btn.classList.contains('active')) {
-                const rect = btn.getBoundingClientRect();
-                const containerRect = navContainer.getBoundingClientRect();
-
-                // Subtle movement toward hovered button
-                indicator.style.opacity = '0.4';
-
-                // Slight width expansion on hover
-                const activeBtn = document.querySelector('.nav-btn.active');
-                if (activeBtn) {
-                    const activeRect = activeBtn.getBoundingClientRect();
-                    const hoverInfluence = 0.15;
-                    const newLeft = (activeRect.left - containerRect.left) +
-                        ((rect.left - activeRect.left) * hoverInfluence);
-
-                    indicator.style.left = `${newLeft}px`;
-                }
-            }
-        });
-
-        btn.addEventListener('mouseleave', () => {
-            const activeBtn = document.querySelector('.nav-btn.active');
-            if (activeBtn) {
-                updateIndicator(activeBtn, false);
+                // Show slider and move to button
                 indicator.style.opacity = '1';
+                updateIndicator(btn, true);
+
+                // Navigate
+                const sectionId = btn.dataset.section;
+                navigateToSection(sectionId);
+
+                // Add ripple
+                addRippleEffect(btn);
+
+                // Cleanup animation flag
+                setTimeout(() => {
+                    btn.classList.remove('animating');
+                }, 500);
             }
         });
     });
@@ -221,63 +365,57 @@ function initLiquidGlassNav() {
         const targetLeft = rect.left - containerRect.left;
 
         if (animate) {
-            // STRETCH EFFECT: Widen the bubble while moving
+            // STRETCH EFFECT
             const stretchAmount = 20;
-            const stretchDamping = 0.5; // Controls how "loose" the stretch feels
 
-            // Step 1: Move to target with a "stretch" state
-            // We widen the bubble and offset 'left' to keep it centered on the target
-            indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1)';
+            // Step 1: Move & Stretch
+            indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
             indicator.style.width = `${rect.width + stretchAmount}px`;
             indicator.style.left = `${targetLeft - (stretchAmount / 2)}px`;
 
-            // Step 2: Settle back to normal size
+            // Step 2: Settle
             setTimeout(() => {
-                indicator.style.transition = 'all 0.3s cubic-bezier(0.5, 0, 0.3, 1)';
+                indicator.style.transition = 'all 0.3s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.3s ease';
                 indicator.style.width = `${rect.width}px`;
                 indicator.style.left = `${targetLeft}px`;
-            }, 250); // Delay matches the main part of the movement
+            }, 250);
 
         } else {
-            // Instant update (no animation)
+            // Instant
             indicator.style.transition = 'none';
             indicator.style.left = `${targetLeft}px`;
             indicator.style.width = `${rect.width}px`;
-            // Force reflow then restore default transition behavior if needed
             indicator.offsetHeight;
             indicator.style.transition = '';
         }
 
+        // Ensure visibility
         indicator.style.opacity = '1';
     }
 
     function addRippleEffect(btn) {
         // Remove existing ripple class
         btn.classList.remove('ripple');
-
-        // Force reflow
-        btn.offsetHeight;
-
-        // Add ripple class
+        btn.offsetHeight; // Force reflow
         btn.classList.add('ripple');
 
         // Haptic-like bounce effect on icon
         const icon = btn.querySelector('.nav-icon');
         if (icon) {
+            const svg = icon.querySelector('svg');
             icon.style.transition = 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
             icon.style.transform = 'scale(0.85)';
 
             setTimeout(() => {
                 icon.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                icon.style.transform = 'scale(1.15)';
+                icon.style.transform = 'scale(1.15)'; // Pop up
             }, 80);
 
             setTimeout(() => {
-                icon.style.transform = 'scale(1.15)';
+                icon.style.transform = 'scale(1.1)'; // Settle slightly larger while active
             }, 300);
         }
 
-        // Remove ripple class after animation
         setTimeout(() => {
             btn.classList.remove('ripple');
         }, 600);

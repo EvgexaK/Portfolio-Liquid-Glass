@@ -69,8 +69,8 @@ body {
     font-family: var(--font-primary);
     background-color: var(--color-bg-dark);
     color: var(--color-text-primary);
-    overflow-x: hidden;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100vh;
     line-height: 1.6;
 }
 
@@ -297,16 +297,24 @@ body {
 .main-content {
     position: relative;
     z-index: 1;
-    min-height: 100vh;
-    padding-bottom: 140px;
+    z-index: 1;
+    height: 100vh;
 }
 
 .section {
-    min-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     padding: var(--spacing-xl);
+    padding-bottom: 120px;
+    /* Space for nav */
+    box-sizing: border-box;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s ease, transform 0.6s ease;
@@ -322,6 +330,8 @@ body {
 .section-content {
     max-width: 1200px;
     width: 100%;
+    margin: auto;
+    /* Vertically center content safely */
 }
 
 .section-title {
@@ -548,6 +558,63 @@ body {
     z-index: 1000;
     /* Subtle floating animation */
     animation: navFloat 6s ease-in-out infinite;
+    /* Layout for menu + lang button */
+    /* display: flex; -> removed to allow absolute positioning relative to centered container */
+    width: max-content;
+    /* Ensure centered base is just the menu */
+}
+
+/* Language Switch Bubble */
+.lang-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    /* Replicating the Premium Glass Effect */
+    background: rgba(20, 20, 25, 0.01);
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    transition: all 0.3s var(--spring-smooth);
+
+    /* Position absolutely to the right of the centered menu */
+    position: absolute;
+    left: 100%;
+    margin-left: 16px;
+    top: 50%;
+    margin-top: -32px;
+    /* Half height to center vertically */
+
+    overflow: hidden;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 35px 70px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.lang-btn:active {
+    transform: scale(0.95);
+}
+
+.lang-icon svg {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 @keyframes navFloat {
@@ -612,7 +679,7 @@ body {
     color: rgba(255, 255, 255, 0.5);
     user-select: none;
     -webkit-user-select: none;
-    min-width: 100px;
+    min-width: 120px;
 }
 
 .nav-btn:hover {
@@ -621,6 +688,11 @@ body {
 
 .nav-btn.active {
     color: rgba(255, 255, 255, 1);
+}
+
+.nav-btn.active .nav-label {
+    opacity: 1;
+    font-weight: 600;
 }
 
 .nav-icon {
@@ -638,8 +710,11 @@ body {
 }
 
 /* Smooth scale on active */
-.nav-btn.active .nav-icon {
+.nav-btn.active .nav-icon svg {
     transform: scale(1.1);
+    fill: currentColor;
+    /* Fill icon on active */
+    stroke: none;
 }
 
 /* Press animation */
@@ -679,9 +754,11 @@ body {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     border-radius: 50px;
-    transition: all 0.6s cubic-bezier(0.25, 1.5, 0.5, 1);
+    transition: all 0.6s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease;
     z-index: 1;
     top: 6px;
+    opacity: 0;
+    /* Hidden by default */
 
     /* Soft volume shadows - Bottom/Right only */
     box-shadow:
