@@ -26,8 +26,9 @@ jobs:
               git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git /var/www/html
             else
               cd /var/www/html
-              git pull origin master
+              git fetch origin master
+              git reset --hard origin/master
             fi
             
             # Restart Nginx to apply any config changes
-            systemctl reload nginx
+            sudo systemctl reload nginx
