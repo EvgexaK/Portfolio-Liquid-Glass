@@ -4,27 +4,11 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    detectChromeWindows();
     initInteractiveGradient();
     initLiquidGlassNav();
     initSectionNavigation();
     initLanguageSwitcher();
 });
-
-/**
- * Detect Chrome on Windows and disable expensive backdrop-filter
- * Chrome on Windows has severe performance issues with backdrop-filter
- */
-function detectChromeWindows() {
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    const isEdge = /Edg/.test(navigator.userAgent); // Edge also contains "Chrome" but has "Edg"
-    const isWindows = navigator.platform.indexOf('Win') > -1;
-
-    if (isChrome && !isEdge && isWindows) {
-        document.body.classList.add('chrome-windows');
-        console.log('Chrome on Windows detected - disabling backdrop-filter for performance');
-    }
-}
 
 /**
  * Language Switcher
