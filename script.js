@@ -178,10 +178,21 @@ function initLanguageSwitcher() {
 /**
  * Interactive Gradient Background
  * Orbs react to mouse position by changing size/pattern - no cursor-following light
+ * Performance optimized for Chrome on Windows
  */
 function initInteractiveGradient() {
     const orbs = document.querySelectorAll('.gradient-orb');
     const gradientBg = document.querySelector('.gradient-bg');
+
+    // Performance: Detect Chrome on Windows for throttling
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    const isWindows = navigator.platform.indexOf('Win') > -1;
+    const needsThrottling = isChrome && isWindows;
+
+    // Performance: Frame rate throttling for Chrome on Windows
+    let lastFrameTime = 0;
+    const targetFPS = needsThrottling ? 30 : 60; // Reduce to 30fps on Chrome/Windows
+    const frameInterval = 1000 / targetFPS;
 
     // Mouse position tracking
     let mouseX = window.innerWidth / 2;
@@ -189,6 +200,33 @@ function initInteractiveGradient() {
     let targetX = mouseX;
     let targetY = mouseY;
     let isMouseInside = false;
+
+    // Performance: Cache orb positions (update on resize instead of every frame)
+    let orbPositions = [];
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    function cacheOrbPositions() {
+        windowWidth = window.innerWidth;
+        windowHeight = window.innerHeight;
+        orbPositions = Array.from(orbs).map(orb => {
+            const rect = orb.getBoundingClientRect();
+            return {
+                centerX: (rect.left + rect.width / 2) / windowWidth,
+                centerY: (rect.top + rect.height / 2) / windowHeight
+            };
+        });
+    }
+
+    // Initial cache
+    cacheOrbPositions();
+
+    // Update cache on resize (debounced)
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(cacheOrbPositions, 150);
+    });
 
     // Base orb configurations
     const orbConfigs = [
@@ -207,8 +245,8 @@ function initInteractiveGradient() {
 
     document.addEventListener('mouseleave', () => {
         isMouseInside = false;
-        targetX = window.innerWidth / 2;
-        targetY = window.innerHeight / 2;
+        targetX = windowWidth / 2;
+        targetY = windowHeight / 2;
     });
 
     // Track mouse movement
@@ -228,12 +266,21 @@ function initInteractiveGradient() {
 
     document.addEventListener('touchend', () => {
         isMouseInside = false;
-        targetX = window.innerWidth / 2;
-        targetY = window.innerHeight / 2;
+        targetX = windowWidth / 2;
+        targetY = windowHeight / 2;
     });
 
     // Animation loop - orbs react to mouse
-    function animate() {
+    function animate(currentTime) {
+        requestAnimationFrame(animate);
+
+        // Performance: Frame rate throttling
+        if (needsThrottling) {
+            const elapsed = currentTime - lastFrameTime;
+            if (elapsed < frameInterval) return;
+            lastFrameTime = currentTime - (elapsed % frameInterval);
+        }
+
         time += 0.008;
 
         // Smooth mouse following
@@ -242,8 +289,8 @@ function initInteractiveGradient() {
         mouseY += (targetY - mouseY) * lerpFactor;
 
         // Calculate mouse position relative to center
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
+        const centerX = windowWidth / 2;
+        const centerY = windowHeight / 2;
         const offsetX = (mouseX - centerX) / centerX; // -1 to 1
         const offsetY = (mouseY - centerY) / centerY; // -1 to 1
 
@@ -251,14 +298,12 @@ function initInteractiveGradient() {
         orbs.forEach((orb, index) => {
             const config = orbConfigs[index] || orbConfigs[0];
 
-            // Get orb position
-            const orbRect = orb.getBoundingClientRect();
-            const orbCenterX = (orbRect.left + orbRect.width / 2) / window.innerWidth;
-            const orbCenterY = (orbRect.top + orbRect.height / 2) / window.innerHeight;
+            // Performance: Use cached positions instead of getBoundingClientRect every frame
+            const orbPos = orbPositions[index] || { centerX: 0.5, centerY: 0.5 };
 
             // Direction from orb to mouse
-            const toMouseX = (mouseX / window.innerWidth) - orbCenterX;
-            const toMouseY = (mouseY / window.innerHeight) - orbCenterY;
+            const toMouseX = (mouseX / windowWidth) - orbPos.centerX;
+            const toMouseY = (mouseY / windowHeight) - orbPos.centerY;
             const distToMouse = Math.sqrt(toMouseX * toMouseX + toMouseY * toMouseY);
 
             // Proximity factor - closer orbs react more
@@ -293,16 +338,14 @@ function initInteractiveGradient() {
                 opacity = 0.5 + proximityFactor * 0.5;
             }
 
-            // Apply transform
-            orb.style.transform = `translate(${totalX}px, ${totalY}px) scale(${totalScale})`;
+            // Apply transform (translateZ(0) added in CSS for GPU acceleration)
+            orb.style.transform = `translate3d(${totalX}px, ${totalY}px, 0) scale(${totalScale})`;
             orb.style.opacity = opacity;
         });
-
-        requestAnimationFrame(animate);
     }
 
     // Start animation
-    animate();
+    requestAnimationFrame(animate);
 }
 
 /**
