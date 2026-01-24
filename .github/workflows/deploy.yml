@@ -31,4 +31,4 @@ jobs:
             fi
             
             # Restart Nginx to apply any config changes
-            sudo systemctl reload nginx
+            systemctl reload nginx
