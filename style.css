@@ -968,36 +968,3 @@ body {
     transform: translateY(-40px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
-
-/* ========================================
-   Chrome on Windows Performance Fix
-   Disables backdrop-filter which causes severe lag
-======================================== */
-.chrome-windows .nav-container {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(15, 20, 30, 0.85) !important;
-}
-
-.chrome-windows .lang-btn {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(15, 20, 30, 0.85) !important;
-}
-
-.chrome-windows .work-card {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(20, 30, 50, 0.7) !important;
-}
-
-.chrome-windows .skill-tag {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(20, 30, 50, 0.6) !important;
-}
-
-.chrome-windows .gradient-orb {
-    filter: blur(80px) !important;
-    opacity: 0.6 !important;
-}
