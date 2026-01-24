@@ -18,14 +18,19 @@
     --color-text-muted: rgba(255, 255, 255, 0.5);
 
     /* Liquid Glass - Apple Style */
+    /* Reduced blur for better Chrome performance */
     --glass-bg: rgba(255, 255, 255, 0.12);
     --glass-bg-hover: rgba(255, 255, 255, 0.18);
     --glass-border: rgba(255, 255, 255, 0.25);
     --glass-border-inner: rgba(255, 255, 255, 0.4);
     --glass-highlight: rgba(255, 255, 255, 0.5);
-    --glass-blur: 60px;
-    --glass-saturation: 200%;
+    --glass-blur: 40px;
+    --glass-saturation: 180%;
     --glass-brightness: 1.1;
+
+    /* Performance: Reduced blur values for navigation */
+    --nav-blur: 12px;
+    --orb-blur: 60px;
 
     /* Typography */
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -91,6 +96,9 @@ body {
             #0d1a2d 50%,
             #0a1525 75%,
             #050a12 100%);
+    /* Performance: GPU layer isolation */
+    contain: strict;
+    transform: translateZ(0);
 }
 
 /* Ambient gradient layer that flows continuously */
@@ -166,10 +174,15 @@ body {
 .gradient-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
+    /* Performance: Reduced blur from 100px to orb-blur variable */
+    filter: blur(var(--orb-blur));
     opacity: 0.8;
     will-change: transform, opacity;
     transition: opacity 0.4s ease;
+    /* Performance: Force GPU compositing */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: layout style paint;
 }
 
 .gradient-orb-1 {
@@ -422,10 +435,14 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: var(--spacing-xl);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    /* Performance: Reduced blur for Chrome */
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
     transition: transform var(--transition-bounce), box-shadow var(--transition-smooth);
     cursor: pointer;
+    /* Performance: GPU layer */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .work-card:hover {
@@ -478,9 +495,11 @@ body {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: 50px;
     font-size: 0.9rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* Performance: Reduced blur for Chrome */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transition: all var(--transition-fast);
+    transform: translateZ(0);
 }
 
 .skill-tag:hover {
@@ -574,10 +593,10 @@ body {
     justify-content: center;
     cursor: pointer;
 
-    /* Replicating the Premium Glass Effect */
-    background: rgba(20, 20, 25, 0.01);
-    backdrop-filter: blur(8px) saturate(140%);
-    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    /* Performance: Solid background instead of heavy blur */
+    background: rgba(20, 20, 25, 0.6);
+    backdrop-filter: blur(var(--nav-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(140%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
         0 30px 60px rgba(0, 0, 0, 0.3),
@@ -594,6 +613,9 @@ body {
     /* Half height to center vertically */
 
     overflow: hidden;
+    /* Performance: GPU layer */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .lang-btn:hover {
@@ -634,10 +656,10 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px;
-    /* iOS Super-Glass: Almost invisible background, clear blur */
-    background: rgba(20, 20, 25, 0.01);
-    backdrop-filter: blur(8px) saturate(140%);
-    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    /* Performance: More opaque background reduces blur rendering cost */
+    background: rgba(20, 20, 25, 0.5);
+    backdrop-filter: blur(var(--nav-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(140%);
     /* Rounded pill */
     border-radius: 50px;
     /* Ultra-subtle border */
@@ -649,6 +671,10 @@ body {
     position: relative;
     overflow: hidden;
     transition: all 0.4s var(--spring-smooth);
+    /* Performance: Force GPU layer */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: layout style;
 }
 
 /* Remove decorative elements */
@@ -751,8 +777,7 @@ body {
             rgba(255, 255, 255, 0.05) 0%,
             rgba(255, 255, 255, 0.02) 40%,
             rgba(255, 255, 255, 0.0) 100%);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* Performance: Removed backdrop-filter from indicator - parent already blurs */
     border-radius: 50px;
     transition: all 0.6s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease;
     z-index: 1;
@@ -769,6 +794,9 @@ body {
 
     /* No border to avoid outlines */
     border: none;
+    /* Performance: GPU layer */
+    transform: translateZ(0);
+    will-change: transform, left, width;
 }
 
 /* Specular Reflection - Subtle Sheen */
