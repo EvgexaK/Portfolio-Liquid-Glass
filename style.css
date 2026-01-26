@@ -716,6 +716,12 @@ body {
     transition: transform 0.3s var(--spring-bounce);
 }
 
+/* Home Icon Correction */
+.nav-btn[data-section="hero"] .nav-icon svg {
+    transform: scale(0.85);
+    /* Slightly smaller to match visual weight */
+}
+
 .nav-icon svg {
     width: 100%;
     height: 100%;
