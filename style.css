@@ -735,6 +735,11 @@ body {
     stroke: none;
 }
 
+/* Home Icon Active Correction */
+.nav-btn.active[data-section="hero"] .nav-icon svg {
+    transform: scale(0.95);
+}
+
 /* Press animation */
 .nav-btn:active .nav-icon {
     transform: scale(0.9);
