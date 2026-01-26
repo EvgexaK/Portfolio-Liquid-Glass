@@ -20,15 +20,23 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            # Update the repository on the server
-            if [ ! -d "/var/www/html/.git" ]; then
-              rm -rf /var/www/html/*
-              git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git /var/www/html
-            else
-              cd /var/www/html
-              git fetch origin master
-              git reset --hard origin/master
+            # Ensure target directory exists
+            mkdir -p /var/www/html
+            cd /var/www/html
+            
+            # Initialize or re-initialize git if needed
+            if [ ! -d ".git" ]; then
+              rm -rf * .??*
+              git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git .
             fi
             
-            # Restart Nginx to apply any config changes
+            # Force set remote to ensure it's correct
+            git remote set-url origin https://github.com/EvgexaK/Portfolio-Liquid-Glass.git
+            
+            # Force fetch and reset
+            git fetch --all
+            git reset --hard origin/master
+            git clean -fd
+            
+            # Restart Nginx
             systemctl reload nginx
