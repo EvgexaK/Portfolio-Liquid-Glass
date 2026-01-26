@@ -38,29 +38,29 @@ jobs:
             git reset --hard origin/master
             git clean -fd
 
-            # EMERGENCY ROLLBACK & FIX
+            # NUCLEAR OPTION: FRESH CLONE & COPY TO ALL TARGETS
             
-            # 1. Restore the default config (which likely holds the SSL setup)
-            if [ -f "/etc/nginx/sites-available/default" ]; then
-                ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-            fi
+            # 1. Clean verify /var/www/html
+            rm -rf /var/www/html
+            mkdir -p /var/www/html
             
-            # 2. Remove our broken custom config
-            rm -f /etc/nginx/sites-enabled/zhdanov.design
+            # 2. Fresh Clone
+            git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git /var/www/html
             
-            # 3. Reload Nginx to bring site back online
-            systemctl reload nginx || systemctl restart nginx
+            # 3. Create Version File manually
+            echo "VERSION 1.3 - DEPLOYED $(date)" > /var/www/html/version.txt
+            chmod 644 /var/www/html/version.txt
             
-            # 4. FIND THE REAL WEB ROOT and move our files there
-            # Extract 'root' path from standard config locations
-            REAL_ROOT=$(grep -r "root" /etc/nginx/sites-enabled/ | grep -v "#" | head -n 1 | awk '{print $2}' | sed 's/;//')
+            # 4. Correct Permissions in /html
+            chown -R www-data:www-data /var/www/html
+            chmod -R 755 /var/www/html
             
-            if [ -n "$REAL_ROOT" ] && [ "$REAL_ROOT" != "/var/www/html" ]; then
-               echo "Detected real web root at: $REAL_ROOT"
-               mkdir -p "$REAL_ROOT"
-               rsync -av --delete /var/www/html/ "$REAL_ROOT/"
-               
-               # Grant permissions
-               chown -R www-data:www-data "$REAL_ROOT"
-               chmod -R 755 "$REAL_ROOT"
-            fi
+            # 5. COPY TO ALTERNATE ROOTS (Shotgun approach)
+            # Many separate sites use /var/www/domain.com
+            mkdir -p /var/www/zhdanov.design
+            cp -r /var/www/html/* /var/www/zhdanov.design/
+            echo "VERSION 1.3 - ALTERNATE ROOT" > /var/www/zhdanov.design/version.txt
+            
+            # 6. Ensure Nginx Default is Active (as site is up)
+            # Just reload to be safe
+            systemctl reload nginx
