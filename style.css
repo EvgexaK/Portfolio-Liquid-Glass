@@ -63,6 +63,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    /* Remove blue highlight on mobile */
 }
 
 html {
@@ -862,11 +864,16 @@ body {
 ======================================== */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: clamp(2.5rem, 15vw, 5rem);
+        /* Maximize width usage */
+        font-size: clamp(3.5rem, 17vw, 6rem);
+        width: 100%;
+        line-height: 0.9;
     }
 
     .title-accent {
-        margin-left: 20%;
+        /* Shifted to the right, but not fully */
+        margin-left: 35%;
+        display: block;
     }
 
     .hero-info {
@@ -875,25 +882,33 @@ body {
     }
 
     .nav-container {
-        padding: 10px;
-        gap: 8px;
+        padding: 8px;
+        gap: 4px;
+        /* Ensure fits on small screens */
+        max-width: 95vw;
     }
 
     .nav-btn {
-        padding: 8px 28px;
+        padding: 8px 16px;
+        min-width: 0;
+        /* Allow shrinking */
+        flex: 1;
+        /* Distribute space */
     }
 
     .nav-icon {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
+        margin-bottom: 2px;
     }
 
     .nav-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
     .section {
-        padding: var(--spacing-lg);
+        /* "Little padding" - maximizing screen real estate */
+        padding: var(--spacing-md) var(--spacing-sm);
     }
 
     .works-grid {
