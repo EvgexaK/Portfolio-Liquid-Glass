@@ -31,10 +31,10 @@ function initLanguageSwitcher() {
             "hero.line1": "Creative",
             "hero.line2": "visual",
             "hero.line3": "designer",
-            "hero.role": "WEB & MOBILE / UX&UI / BRANDING",
+            "hero.role": "WEB & MOBILE / PRINTED PRODUCT / BRANDING",
             "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
             "hero.based.label": "BASED",
-            "hero.based.city": "IN LONDON",
+            "hero.based.city": "IN CHEREPOVETS",
             "works.title": "Selected Works",
             "works.1.title": "Brand Identity",
             "works.1.desc": "Complete visual identity for tech startup",
@@ -59,10 +59,10 @@ function initLanguageSwitcher() {
             "hero.line1": "Креативный",
             "hero.line2": "визуальный",
             "hero.line3": "дизайнер",
-            "hero.role": "ВЕБ & МОБАЙЛ / UX&UI / БРЕНДИНГ",
+            "hero.role": "ВЕБ & МОБАЙЛ / ПЕЧАТНАЯ ПРОДУКЦИЯ / БРЕНДИНГ",
             "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
             "hero.based.label": "ЛОКАЦИЯ",
-            "hero.based.city": "ЛОНДОН",
+            "hero.based.city": "ЧЕРЕПОВЕЦ",
             "works.title": "Избранные проекты",
             "works.1.title": "Айдентика бренда",
             "works.1.desc": "Полный визуальный стиль для стартапа",
@@ -211,20 +211,52 @@ function initInteractiveGradient() {
     ];
 
     // Theme & Navigation Logic
-    let targetPan = 0;
-    let currentPan = 0;
+    // Theme & Navigation Logic
+    // Deleted targetPan/currentPan to replace with per-orb vectors
     let targetHue = 0;
     let currentHue = 0;
 
-    window.addEventListener('set-theme', (e) => {
-        const idx = e.detail.index || 0;
-        // Map index to Theme Properties
-        // 0 (Works): Default Blue/Purple
-        // 1 (About): Teal/Green (Hue 90) + Pan Right
-        // 2 (Contact): Gold/Warm (Hue 210) + Pan Further Right
+    // Theme Configurations (Index: -1=Hero, 0=Works, 1=About, 2=Contact)
+    // Defines shifts (x, y) in viewport percentage (switched to px in listener)
+    const layouts = {
+        '-1': [ // Hero (Default positions)
+            { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }
+        ],
+        '0': [ // Works (Scatter outward)
+            { x: -100, y: 50 }, { x: 100, y: -50 }, { x: -50, y: -50 }, { x: 150, y: 50 }
+        ],
+        '1': [ // About (Cluster / Swap sides)
+            { x: -500, y: 200 }, { x: 400, y: -200 }, { x: 200, y: -100 }, { x: -200, y: 100 }
+        ],
+        '2': [ // Contact (Vertical shift)
+            { x: 0, y: 300 }, { x: 0, y: -300 }, { x: 300, y: 0 }, { x: -300, y: 0 }
+        ]
+    };
 
-        targetHue = idx === 1 ? 90 : (idx === 2 ? 210 : 0);
-        targetPan = idx * 100; // Shift 0, 100, 200px
+    // State Objects for interpolation
+    let targetOrbStates = [
+        { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }
+    ];
+    let currentOrbStates = [
+        { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }
+    ];
+
+    window.addEventListener('set-theme', (e) => {
+        const idx = e.detail.index; // Can be -1 now
+
+        // Hues: Hero(0), Works(30), About(190-Teal), Contact(280-Purple/Gold mix)
+        targetHue = idx === -1 ? 0 : (idx === 0 ? 30 : (idx === 1 ? 160 : 320));
+
+        const layout = layouts[idx] || layouts['-1'];
+
+        // Update targets (convert somewhat arbitrary "px" units to responsive logic if needed, 
+        // but simple px offsets work well for subtle shifts)
+        targetOrbStates.forEach((t, i) => {
+            if (layout[i]) {
+                t.x = layout[i].x;
+                t.y = layout[i].y;
+            }
+        });
     });
 
     function animate() {
@@ -233,8 +265,18 @@ function initInteractiveGradient() {
         currentY += (mouseY - currentY) * 0.05;
 
         // Smooth transition for Theme props
-        currentPan += (targetPan - currentPan) * 0.05;
-        currentHue += (targetHue - currentHue) * 0.05;
+        // Smooth transition for Global Hue
+        currentHue += (targetHue - currentHue) * 0.04;
+
+        // Smooth transition for Per-Orb Positions
+        orbs.forEach((_, i) => {
+            // Lerp current state towards target state
+            const state = currentOrbStates[i];
+            const target = targetOrbStates[i];
+
+            state.x += (target.x - state.x) * 0.03; // Slower, smoother movement
+            state.y += (target.y - state.y) * 0.03;
+        });
 
         // Calculate offset from center (-1 to 1)
         const w = window.innerWidth || 1;
@@ -249,22 +291,23 @@ function initInteractiveGradient() {
             const mouseTx = xPct * s * 10 * -1;
             const mouseTy = yPct * s * 5 * -1;
 
-            // Apply Pan (Carousel effect) - opposite direction for depth
-            const panTx = currentPan * s * -0.5;
-
-            const tx = mouseTx + panTx;
+            // Note: Pan logic moved to final calculation
             const ty = mouseTy;
 
             // Simple Rotation
             const rot = xPct * s * 5;
 
+            // Apply calculated smooth positions
+            // Base moves (targets) + Mouse Parallax (tx, ty) 
+            const finalX = mouseTx + currentOrbStates[i].x;
+            const finalY = mouseTy + currentOrbStates[i].y;
+
             // Apply transform directly (including hue-rotate)
             orb.style.cssText = `
                 display: block; 
                 position: absolute; 
-                transform: translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(1) !important;
+                transform: translate3d(${finalX}px, ${finalY}px, 0) rotate(${rot}deg) scale(1) !important;
                 filter: blur(80px) hue-rotate(${currentHue}deg) saturate(1.2);
-                transition: opacity 1s ease;
                 will-change: transform, filter;
             `;
         });
@@ -297,6 +340,7 @@ function initLiquidGlassNav() {
             if (isAlreadyActive) {
                 indicator.style.opacity = '0';
                 navigateToSection('hero');
+                window.dispatchEvent(new CustomEvent('set-theme', { detail: { index: -1 } }));
             } else {
                 btn.classList.add('active');
                 btn.classList.add('animating');
@@ -324,20 +368,34 @@ function initLiquidGlassNav() {
 
         if (animate) {
             const stretchAmount = 20;
+            const stretchHeight = 8; // Height increase during animation
+
             indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
+
+            // Width stretch
             indicator.style.width = `${rect.width + stretchAmount}px`;
             indicator.style.left = `${targetLeft - (stretchAmount / 2)}px`;
 
+            // Height stretch (make it taller)
+            indicator.style.height = `calc(100% - ${12 - stretchHeight}px)`;
+            indicator.style.top = `${6 - (stretchHeight / 2)}px`;
+
             setTimeout(() => {
                 indicator.style.transition = 'all 0.3s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.3s ease';
+                // Reset width
                 indicator.style.width = `${rect.width}px`;
                 indicator.style.left = `${targetLeft}px`;
-            }, 250);
 
+                // Reset height
+                indicator.style.height = 'calc(100% - 12px)';
+                indicator.style.top = '6px';
+            }, 250);
         } else {
             indicator.style.transition = 'none';
             indicator.style.left = `${targetLeft}px`;
             indicator.style.width = `${rect.width}px`;
+            indicator.style.height = 'calc(100% - 12px)';
+            indicator.style.top = '6px';
             indicator.offsetHeight;
             indicator.style.transition = '';
         }
