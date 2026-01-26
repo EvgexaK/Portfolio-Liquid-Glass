@@ -17,7 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 function initLanguageSwitcher() {
     const langBtn = document.querySelector('.lang-btn');
     const langIcon = document.querySelector('.lang-icon');
-    let currentLang = 'en'; // Start in English (so we show RU switch option)
+
+    // Detect browser/system language - check if Russian
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+    const isRussian = browserLang.toLowerCase().startsWith('ru');
+
+    // Set initial language based on browser preference
+    let currentLang = isRussian ? 'ru' : 'en';
 
     // Translation Dictionary
     const translations = {
@@ -106,35 +112,36 @@ function initLanguageSwitcher() {
     `;
 
     if (langBtn && langIcon) {
-        langBtn.addEventListener('click', () => {
-            // Add ripple/press effect
-            langBtn.style.transform = 'scale(0.9)';
+        langIcon.innerHTML = currentLang === 'en' ? ruFlag : enFlag;
 
+        if (isRussian) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations.ru[key]) {
+                    el.textContent = translations.ru[key];
+                }
+            });
+        }
+
+        langBtn.addEventListener('click', () => {
+            langBtn.style.transform = 'scale(0.9)';
             setTimeout(() => {
                 langBtn.style.transform = 'scale(1)';
-
-                // Toggle Language
                 const nextLang = currentLang === 'en' ? 'ru' : 'en';
                 currentLang = nextLang;
-
-                // Switch Icon with fade
+                window.dispatchEvent(new Event('toggle-theme'));
                 langIcon.style.opacity = '0';
                 langIcon.style.transform = 'rotate(30deg) scale(0.8)';
 
                 setTimeout(() => {
-                    // If we are now in RU, show EN flag (to switch back)
-                    // If we are now in EN, show RU flag (to switch to)
                     const showRuFlag = currentLang === 'en';
                     langIcon.innerHTML = showRuFlag ? ruFlag : enFlag;
-
                     langIcon.style.opacity = '1';
                     langIcon.style.transform = 'rotate(0) scale(1)';
                     langIcon.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
                 }, 200);
 
-                // Translate Page Content
                 translateContent(currentLang);
-
             }, 100);
         });
     }
@@ -143,26 +150,19 @@ function initLanguageSwitcher() {
         document.querySelectorAll('[data-i18n]').forEach((el, index) => {
             const key = el.getAttribute('data-i18n');
             if (translations[lang][key]) {
-                // Stagger animations slightly for organic feel
                 const delay = index * 10;
-
                 setTimeout(() => {
-                    // Start Dissolve: Blur out, fade out, drift down slightly
                     el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                     el.style.filter = 'blur(10px)';
                     el.style.opacity = '0';
                     el.style.transform = 'translateY(4px) scale(0.95)';
 
                     setTimeout(() => {
-                        // Swap Content
                         el.textContent = translations[lang][key];
-
-                        // Re-materialize: Sharpen, fade in, settle
                         el.style.filter = 'blur(0px)';
                         el.style.opacity = '1';
                         el.style.transform = 'translateY(0) scale(1)';
 
-                        // Force navigation indicator update
                         if (key.startsWith('nav.')) {
                             requestAnimationFrame(() => {
                                 window.dispatchEvent(new Event('resize'));
@@ -176,176 +176,103 @@ function initLanguageSwitcher() {
 }
 
 /**
- * Interactive Gradient Background
- * Orbs react to mouse position by changing size/pattern - no cursor-following light
- * Performance optimized for Chrome on Windows
+ * Interactive Gradient Background - Robust Version
+ * Directly calculates transform to ensure responsiveness
  */
 function initInteractiveGradient() {
     const orbs = document.querySelectorAll('.gradient-orb');
-    const gradientBg = document.querySelector('.gradient-bg');
 
-    // Performance: Detect Chrome on Windows for throttling
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    const isWindows = navigator.platform.indexOf('Win') > -1;
-    const needsThrottling = isChrome && isWindows;
-
-    // Performance: Frame rate throttling for Chrome on Windows
-    let lastFrameTime = 0;
-    const targetFPS = needsThrottling ? 30 : 60; // Reduce to 30fps on Chrome/Windows
-    const frameInterval = 1000 / targetFPS;
-
-    // Mouse position tracking
+    // State tracking
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
-    let targetX = mouseX;
-    let targetY = mouseY;
-    let isMouseInside = false;
+    let currentX = mouseX;
+    let currentY = mouseY;
 
-    // Performance: Cache orb positions (update on resize instead of every frame)
-    let orbPositions = [];
-    let windowWidth = window.innerWidth;
-    let windowHeight = window.innerHeight;
-
-    function cacheOrbPositions() {
-        windowWidth = window.innerWidth;
-        windowHeight = window.innerHeight;
-        orbPositions = Array.from(orbs).map(orb => {
-            const rect = orb.getBoundingClientRect();
-            return {
-                centerX: (rect.left + rect.width / 2) / windowWidth,
-                centerY: (rect.top + rect.height / 2) / windowHeight
-            };
-        });
-    }
-
-    // Initial cache
-    cacheOrbPositions();
-
-    // Update cache on resize (debounced)
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(cacheOrbPositions, 150);
-    });
-
-    // Base orb configurations
-    const orbConfigs = [
-        { baseScale: 1, sensitivity: 0.15, phaseOffset: 0 },
-        { baseScale: 1, sensitivity: 0.12, phaseOffset: Math.PI * 0.5 },
-        { baseScale: 1, sensitivity: 0.18, phaseOffset: Math.PI },
-        { baseScale: 1, sensitivity: 0.1, phaseOffset: Math.PI * 1.5 }
-    ];
-
-    let time = 0;
-
-    // Track mouse entering viewport
-    document.addEventListener('mouseenter', () => {
-        isMouseInside = true;
-    });
-
-    document.addEventListener('mouseleave', () => {
-        isMouseInside = false;
-        targetX = windowWidth / 2;
-        targetY = windowHeight / 2;
-    });
-
-    // Track mouse movement
-    document.addEventListener('mousemove', (e) => {
-        targetX = e.clientX;
-        targetY = e.clientY;
+    // Direct event listener
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
     });
 
     // Touch support
-    document.addEventListener('touchmove', (e) => {
+    window.addEventListener('touchmove', (e) => {
         if (e.touches.length > 0) {
-            targetX = e.touches[0].clientX;
-            targetY = e.touches[0].clientY;
-            isMouseInside = true;
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
         }
     }, { passive: true });
 
-    document.addEventListener('touchend', () => {
-        isMouseInside = false;
-        targetX = windowWidth / 2;
-        targetY = windowHeight / 2;
+    // Configuration for parallax layers
+    const configs = [
+        { s: 1.5 },   // Front layer (moves opposite to mouse)
+        { s: -0.8 },  // Mid layer (follows mouse)
+        { s: 1.2 },   // Front layer
+        { s: -1.8 }   // Back layer (follows mouse strongly)
+    ];
+
+    // Theme & Navigation Logic
+    let targetPan = 0;
+    let currentPan = 0;
+    let targetHue = 0;
+    let currentHue = 0;
+
+    window.addEventListener('set-theme', (e) => {
+        const idx = e.detail.index || 0;
+        // Map index to Theme Properties
+        // 0 (Works): Default Blue/Purple
+        // 1 (About): Teal/Green (Hue 90) + Pan Right
+        // 2 (Contact): Gold/Warm (Hue 210) + Pan Further Right
+
+        targetHue = idx === 1 ? 90 : (idx === 2 ? 210 : 0);
+        targetPan = idx * 100; // Shift 0, 100, 200px
     });
 
-    // Animation loop - orbs react to mouse
-    function animate(currentTime) {
-        requestAnimationFrame(animate);
+    function animate() {
+        // Smooth lerp
+        currentX += (mouseX - currentX) * 0.05;
+        currentY += (mouseY - currentY) * 0.05;
 
-        // Performance: Frame rate throttling
-        if (needsThrottling) {
-            const elapsed = currentTime - lastFrameTime;
-            if (elapsed < frameInterval) return;
-            lastFrameTime = currentTime - (elapsed % frameInterval);
-        }
+        // Smooth transition for Theme props
+        currentPan += (targetPan - currentPan) * 0.05;
+        currentHue += (targetHue - currentHue) * 0.05;
 
-        time += 0.008;
+        // Calculate offset from center (-1 to 1)
+        const w = window.innerWidth || 1;
+        const h = window.innerHeight || 1;
+        const xPct = (currentX - w / 2) / (w / 2);
+        const yPct = (currentY - h / 2) / (h / 2);
 
-        // Smooth mouse following
-        const lerpFactor = 0.03;
-        mouseX += (targetX - mouseX) * lerpFactor;
-        mouseY += (targetY - mouseY) * lerpFactor;
+        orbs.forEach((orb, i) => {
+            const s = configs[i] ? configs[i].s : 1.0;
 
-        // Calculate mouse position relative to center
-        const centerX = windowWidth / 2;
-        const centerY = windowHeight / 2;
-        const offsetX = (mouseX - centerX) / centerX; // -1 to 1
-        const offsetY = (mouseY - centerY) / centerY; // -1 to 1
+            // Movement Range: Minimal (5% of previous) -> ~10px range
+            const mouseTx = xPct * s * 10 * -1;
+            const mouseTy = yPct * s * 5 * -1;
 
-        // Update each orb based on mouse position
-        orbs.forEach((orb, index) => {
-            const config = orbConfigs[index] || orbConfigs[0];
+            // Apply Pan (Carousel effect) - opposite direction for depth
+            const panTx = currentPan * s * -0.5;
 
-            // Performance: Use cached positions instead of getBoundingClientRect every frame
-            const orbPos = orbPositions[index] || { centerX: 0.5, centerY: 0.5 };
+            const tx = mouseTx + panTx;
+            const ty = mouseTy;
 
-            // Direction from orb to mouse
-            const toMouseX = (mouseX / windowWidth) - orbPos.centerX;
-            const toMouseY = (mouseY / windowHeight) - orbPos.centerY;
-            const distToMouse = Math.sqrt(toMouseX * toMouseX + toMouseY * toMouseY);
+            // Simple Rotation
+            const rot = xPct * s * 5;
 
-            // Proximity factor - closer orbs react more
-            const proximityFactor = Math.max(0, 1 - distToMouse * 1.5);
-
-            // Scale based on mouse proximity
-            let scaleMultiplier = 1;
-            if (isMouseInside) {
-                scaleMultiplier = 1 + proximityFactor * 0.35 - (1 - proximityFactor) * 0.08;
-            }
-
-            // Organic pulsing animation
-            const pulsePhase = time + config.phaseOffset;
-            const pulse = 1 + Math.sin(pulsePhase) * 0.1;
-
-            // Movement - orbs push/pull based on mouse
-            const pushX = -offsetX * config.sensitivity * 100;
-            const pushY = -offsetY * config.sensitivity * 100;
-
-            // Organic floating movement
-            const floatX = Math.sin(time * 0.5 + config.phaseOffset) * 40;
-            const floatY = Math.cos(time * 0.4 + config.phaseOffset) * 35;
-
-            // Combine movements
-            const totalX = pushX + floatX;
-            const totalY = pushY + floatY;
-            const totalScale = scaleMultiplier * pulse;
-
-            // Opacity variation
-            let opacity = 0.75;
-            if (isMouseInside) {
-                opacity = 0.5 + proximityFactor * 0.5;
-            }
-
-            // Apply transform (translateZ(0) added in CSS for GPU acceleration)
-            orb.style.transform = `translate3d(${totalX}px, ${totalY}px, 0) scale(${totalScale})`;
-            orb.style.opacity = opacity;
+            // Apply transform directly (including hue-rotate)
+            orb.style.cssText = `
+                display: block; 
+                position: absolute; 
+                transform: translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg) scale(1) !important;
+                filter: blur(80px) hue-rotate(${currentHue}deg) saturate(1.2);
+                transition: opacity 1s ease;
+                will-change: transform, filter;
+            `;
         });
+
+        requestAnimationFrame(animate);
     }
 
-    // Start animation
-    requestAnimationFrame(animate);
+    animate();
 }
 
 /**
@@ -357,44 +284,32 @@ function initLiquidGlassNav() {
     const indicator = document.querySelector('.nav-indicator');
     const navContainer = document.querySelector('.nav-container');
 
-    // INITIALIZATION:
-    // User wants slider hidden initially. content should be Hero (Main Page).
-    // Ensure no buttons are active visually initially, and indicator is hidden.
     navBtns.forEach(b => b.classList.remove('active'));
     indicator.style.opacity = '0';
 
     navBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Prevent rapid clicking
             if (btn.classList.contains('animating')) return;
 
             const isAlreadyActive = btn.classList.contains('active');
-
-            // 1. Reset all buttons
             navBtns.forEach(b => b.classList.remove('active'));
 
-            // 2. Logic: Toggle
             if (isAlreadyActive) {
-                // Return to Main Page (Hero)
-                indicator.style.opacity = '0'; // Hide slider
+                indicator.style.opacity = '0';
                 navigateToSection('hero');
             } else {
-                // Activate new section
                 btn.classList.add('active');
                 btn.classList.add('animating');
-
-                // Show slider and move to button
                 indicator.style.opacity = '1';
                 updateIndicator(btn, true);
-
-                // Navigate
                 const sectionId = btn.dataset.section;
                 navigateToSection(sectionId);
 
-                // Add ripple
-                addRippleEffect(btn);
+                // Trigger Background Theme Change (Color & Pan)
+                const themeIndex = Array.from(navBtns).indexOf(btn);
+                window.dispatchEvent(new CustomEvent('set-theme', { detail: { index: themeIndex } }));
 
-                // Cleanup animation flag
+                addRippleEffect(btn);
                 setTimeout(() => {
                     btn.classList.remove('animating');
                 }, 500);
@@ -408,15 +323,11 @@ function initLiquidGlassNav() {
         const targetLeft = rect.left - containerRect.left;
 
         if (animate) {
-            // STRETCH EFFECT
             const stretchAmount = 20;
-
-            // Step 1: Move & Stretch
             indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
             indicator.style.width = `${rect.width + stretchAmount}px`;
             indicator.style.left = `${targetLeft - (stretchAmount / 2)}px`;
 
-            // Step 2: Settle
             setTimeout(() => {
                 indicator.style.transition = 'all 0.3s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.3s ease';
                 indicator.style.width = `${rect.width}px`;
@@ -424,7 +335,6 @@ function initLiquidGlassNav() {
             }, 250);
 
         } else {
-            // Instant
             indicator.style.transition = 'none';
             indicator.style.left = `${targetLeft}px`;
             indicator.style.width = `${rect.width}px`;
@@ -432,30 +342,26 @@ function initLiquidGlassNav() {
             indicator.style.transition = '';
         }
 
-        // Ensure visibility
         indicator.style.opacity = '1';
     }
 
     function addRippleEffect(btn) {
-        // Remove existing ripple class
         btn.classList.remove('ripple');
-        btn.offsetHeight; // Force reflow
+        btn.offsetHeight;
         btn.classList.add('ripple');
 
-        // Haptic-like bounce effect on icon
         const icon = btn.querySelector('.nav-icon');
         if (icon) {
-            const svg = icon.querySelector('svg');
             icon.style.transition = 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)';
             icon.style.transform = 'scale(0.85)';
 
             setTimeout(() => {
                 icon.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                icon.style.transform = 'scale(1.15)'; // Pop up
+                icon.style.transform = 'scale(1.15)';
             }, 80);
 
             setTimeout(() => {
-                icon.style.transform = 'scale(1.1)'; // Settle slightly larger while active
+                icon.style.transform = 'scale(1.1)';
             }, 300);
         }
 
@@ -470,7 +376,6 @@ function initLiquidGlassNav() {
  * Smooth transitions between portfolio sections
  */
 function initSectionNavigation() {
-    // Show initial section
     const initialSection = document.querySelector('.section.active');
     if (initialSection) {
         initialSection.style.display = 'flex';
@@ -479,16 +384,21 @@ function initSectionNavigation() {
     }
 }
 
+let navigationTimeout;
+
 function navigateToSection(sectionId) {
     const sections = document.querySelectorAll('.section');
     const targetSection = document.getElementById(sectionId);
 
     if (!targetSection) return;
-
-    // Check if already on this section
     if (targetSection.classList.contains('active')) return;
 
-    // Hide all sections with smooth animation
+    // Clear any pending section display from rapid clicks
+    if (navigationTimeout) {
+        clearTimeout(navigationTimeout);
+        navigationTimeout = null;
+    }
+
     sections.forEach(section => {
         if (section.classList.contains('active')) {
             section.style.transition = 'opacity 0.35s ease-out, transform 0.35s ease-out';
@@ -499,19 +409,22 @@ function navigateToSection(sectionId) {
                 section.classList.remove('active');
                 section.style.display = 'none';
             }, 300);
+        } else {
+            // Ensure hidden state for any section that might have been pending
+            if (section !== targetSection) {
+                section.style.display = 'none';
+                section.classList.remove('active');
+                section.style.opacity = '0';
+            }
         }
     });
 
-    // Show target section with smooth animation
-    setTimeout(() => {
+    navigationTimeout = setTimeout(() => {
         targetSection.style.display = 'flex';
         targetSection.style.opacity = '0';
         targetSection.style.transform = 'translateY(25px) scale(0.98)';
         targetSection.style.transition = 'none';
-
-        // Trigger reflow for animation
         targetSection.offsetHeight;
-
         targetSection.style.transition = 'opacity 0.45s ease-out, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
         targetSection.classList.add('active');
         targetSection.style.opacity = '1';

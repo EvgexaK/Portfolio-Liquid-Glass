@@ -2,17 +2,17 @@
    CSS Variables & Design Tokens
 ======================================== */
 :root {
-    /* Colors */
-    --color-bg-dark: #0a0f1a;
-    --color-bg-gradient-1: #0d2847;
-    --color-bg-gradient-2: #061a2e;
-    --color-bg-gradient-3: #0a1628;
+    /* Colors - Moody Magenta & Cyan Theme */
+    --color-bg-dark: #050506;
+    --color-bg-gradient-1: #0a0a0c;
+    --color-bg-gradient-2: #050506;
+    --color-bg-gradient-3: #000000;
     --color-accent-orange: #e8a54b;
-    --color-accent-blue: #1a4a7a;
-    --color-accent-cyan: #0f3d5c;
-    --color-accent-purple: #5a2d82;
-    --color-accent-pink: #8b2a5c;
-    --color-accent-teal: #0d5c5c;
+    --color-accent-blue: #28b4c8;
+    --color-accent-cyan: #1e8ca0;
+    --color-accent-purple: #b43264;
+    --color-accent-pink: #a03258;
+    --color-accent-teal: #1e7896;
     --color-text-primary: #ffffff;
     --color-text-secondary: rgba(255, 255, 255, 0.7);
     --color-text-muted: rgba(255, 255, 255, 0.5);
@@ -80,7 +80,8 @@ body {
 }
 
 /* ========================================
-   Interactive Gradient Background - Water Ripple Style
+   Interactive Gradient Background - Fluid Liquid Glass
+   Original Colors + New Morphing Shapes
 ======================================== */
 .gradient-bg {
     position: fixed;
@@ -90,206 +91,152 @@ body {
     height: 100%;
     z-index: 0;
     overflow: hidden;
+    /* Restore Original Deep Blue/Navy Base */
     background: linear-gradient(145deg,
             #050a12 0%,
             #0a1525 25%,
             #0d1a2d 50%,
             #0a1525 75%,
             #050a12 100%);
-    /* Performance: GPU layer isolation */
     contain: strict;
     transform: translateZ(0);
 }
 
-/* Ambient gradient layer that flows continuously */
+/* Subtle underlying noise/tint */
 .gradient-bg::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-        radial-gradient(ellipse 40% 30% at 20% 30%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 35% 40% at 80% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 45% 35% at 60% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse 30% 45% at 30% 70%, rgba(34, 211, 238, 0.12) 0%, transparent 50%);
-    animation: ambientFlow 20s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05), transparent 60%);
     pointer-events: none;
+    z-index: -2;
 }
 
-/* Secondary flowing layer for depth */
-.gradient-bg::after {
-    content: '';
-    position: absolute;
-    top: -30%;
-    left: -30%;
-    width: 160%;
-    height: 160%;
-    background:
-        radial-gradient(ellipse 50% 40% at 70% 40%, rgba(14, 165, 233, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 50% at 30% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
-    animation: ambientFlowReverse 25s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes ambientFlow {
-
-    0%,
-    100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-
-    25% {
-        transform: translate(3%, 2%) rotate(1deg) scale(1.02);
-    }
-
-    50% {
-        transform: translate(-2%, 4%) rotate(-0.5deg) scale(1.01);
-    }
-
-    75% {
-        transform: translate(-3%, -2%) rotate(0.5deg) scale(1.03);
-    }
-}
-
-@keyframes ambientFlowReverse {
-
-    0%,
-    100% {
-        transform: translate(0, 0) rotate(0deg);
-    }
-
-    33% {
-        transform: translate(-4%, 3%) rotate(-1deg);
-    }
-
-    66% {
-        transform: translate(3%, -3%) rotate(1deg);
-    }
-}
-
-/* Orbs controlled via JavaScript - no CSS animation */
-
+/* The Abstract Shapes (formerly orbs)
+   Now styled as fluid, morphing blobs */
 .gradient-orb {
+    display: block;
     position: absolute;
+    /* Create organic blob shapes */
     border-radius: 50%;
-    /* Performance: Reduced blur from 100px to orb-blur variable */
-    filter: blur(var(--orb-blur));
-    opacity: 0.8;
-    will-change: transform, opacity;
-    transition: opacity 0.4s ease;
-    /* Performance: Force GPU compositing */
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    contain: layout style paint;
+    /* Heavy blur to diffuse the shapes */
+    filter: blur(80px);
+    opacity: 0.7;
+    /* Soft blending typical of liquid glass */
+    mix-blend-mode: normal;
+    /* Smooth transition for visual properties only - NOT transform, as JS handles movement */
+    transition: opacity 1.5s ease, filter 1.5s ease;
+    will-change: transform, border-radius, opacity;
 }
 
+/* Alternate Theme (Color Shift) */
+.theme-alt .gradient-orb {
+    filter: blur(80px) hue-rotate(140deg) saturate(1.2);
+}
+
+/* Orb 1: Sky Blue (Original Top Right) */
 .gradient-orb-1 {
     width: 60vw;
-    height: 60vw;
-    max-width: 800px;
-    max-height: 800px;
-    background: radial-gradient(circle,
-            rgba(56, 189, 248, 0.75) 0%,
-            rgba(14, 165, 233, 0.4) 40%,
-            transparent 70%);
-    top: -20%;
-    right: -10%;
+    height: 50vh;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(14, 165, 233, 0.2));
+    top: -15%;
+    right: -15%;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    animation: morphBlob 15s ease-in-out infinite alternate;
 }
 
+/* Orb 2: Violet/Purple (Original Bottom Left) */
 .gradient-orb-2 {
-    width: 55vw;
-    height: 55vw;
-    max-width: 700px;
-    max-height: 700px;
-    background: radial-gradient(circle,
-            rgba(139, 92, 246, 0.7) 0%,
-            rgba(168, 85, 247, 0.35) 40%,
-            transparent 70%);
-    bottom: -15%;
+    width: 50vw;
+    height: 60vh;
+    background: linear-gradient(45deg, rgba(139, 92, 246, 0.6), rgba(168, 85, 247, 0.2));
+    top: 25%;
     left: -15%;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    animation: morphBlob 12s ease-in-out infinite alternate-reverse;
 }
 
+/* Orb 3: Pink/Rose (Original Accent) */
 .gradient-orb-3 {
     width: 45vw;
     height: 45vw;
-    max-width: 550px;
-    max-height: 550px;
-    background: radial-gradient(circle,
-            rgba(236, 72, 153, 0.6) 0%,
-            rgba(244, 114, 182, 0.3) 40%,
-            transparent 70%);
-    top: 35%;
-    left: 25%;
+    background: linear-gradient(to top, rgba(236, 72, 153, 0.5), transparent);
+    bottom: -20%;
+    left: 15%;
+    border-radius: 50% 50% 20% 80% / 25% 80% 20% 75%;
+    animation: morphBlob 18s ease-in-out infinite alternate;
+    filter: blur(90px);
 }
 
+/* Orb 4: Bright Cyan (Original Top Left Accent) */
 .gradient-orb-4 {
-    width: 40vw;
-    height: 40vw;
-    max-width: 480px;
-    max-height: 480px;
-    background: radial-gradient(circle,
-            rgba(34, 211, 238, 0.55) 0%,
-            rgba(6, 182, 212, 0.25) 40%,
-            transparent 70%);
-    top: 5%;
-    left: 55%;
+    width: 70vw;
+    height: 40vh;
+    background: linear-gradient(180deg, rgba(34, 211, 238, 0.4), transparent);
+    top: 45%;
+    right: -15%;
+    transform: rotate(-15deg);
+    border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
+    animation: morphBlob 20s ease-in-out infinite alternate;
+    filter: blur(70px);
 }
 
-@keyframes orbFloat1 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    33% {
-        transform: translate(-30px, 40px) scale(1.05);
-    }
-
-    66% {
-        transform: translate(20px, -20px) scale(0.98);
-    }
-}
-
-@keyframes orbFloat2 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-
-    33% {
-        transform: translate(40px, -30px) scale(1.03);
-    }
-
-    66% {
-        transform: translate(-25px, 35px) scale(0.97);
-    }
-}
-
-@keyframes orbFloat3 {
-
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
+/* Animation for Organic Shape Morphing */
+@keyframes morphBlob {
+    0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     }
 
     50% {
-        transform: translate(35px, 25px) scale(1.04);
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+
+    100% {
+        border-radius: 60% 30% 60% 40% / 40% 50% 60% 30%;
     }
 }
 
-@keyframes orbFloat4 {
+/* Slow Floating Animations to break circular movement */
+@keyframes floatBlob1 {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
 
-    0%,
     100% {
+        transform: translate(-5%, 5%) rotate(5deg);
+    }
+}
+
+@keyframes floatBlob2 {
+    0% {
         transform: translate(0, 0) scale(1);
     }
 
-    50% {
-        transform: translate(-40px, -30px) scale(1.02);
+    100% {
+        transform: translate(5%, -5%) scale(1.1);
+    }
+}
+
+@keyframes floatBlob3 {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-10%, 0) rotate(-10deg);
+    }
+}
+
+@keyframes floatBlob4 {
+    0% {
+        transform: rotate(-15deg) translate(0, 0);
+    }
+
+    100% {
+        transform: rotate(-12deg) translate(-5%, 10%);
     }
 }
 
@@ -299,9 +246,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
     pointer-events: none;
+    z-index: 1;
 }
 
 /* ========================================
