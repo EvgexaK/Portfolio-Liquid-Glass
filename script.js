@@ -51,6 +51,7 @@ function initLanguageSwitcher() {
             "skills.5": "Design Systems",
             "contact.title": "Get in Touch",
             "contact.text": "Ready to bring your vision to life? Let's create something amazing together.",
+            "nav.home": "Home",
             "nav.works": "Works",
             "nav.about": "About",
             "nav.contact": "Contact"
@@ -79,6 +80,7 @@ function initLanguageSwitcher() {
             "skills.5": "Дизайн-системы",
             "contact.title": "Связаться",
             "contact.text": "Готовы воплотить идеи в жизнь? Давайте создадим что-то удивительное вместе.",
+            "nav.home": "Главная",
             "nav.works": "Работы",
             "nav.about": "Инфо",
             "nav.contact": "Контакты"
@@ -216,19 +218,19 @@ function initInteractiveGradient() {
     let targetHue = 0;
     let currentHue = 0;
 
-    // Theme Configurations (Index: -1=Hero, 0=Works, 1=About, 2=Contact)
+    // Theme Configurations (Index: 0=Hero, 1=Works, 2=About, 3=Contact)
     // Defines shifts (x, y) in viewport percentage (switched to px in listener)
     const layouts = {
-        '-1': [ // Hero (Default positions)
+        '0': [ // Hero (Default positions)
             { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }
         ],
-        '0': [ // Works (Scatter outward)
+        '1': [ // Works (Scatter outward)
             { x: -100, y: 50 }, { x: 100, y: -50 }, { x: -50, y: -50 }, { x: 150, y: 50 }
         ],
-        '1': [ // About (Cluster / Swap sides)
+        '2': [ // About (Cluster / Swap sides)
             { x: -500, y: 200 }, { x: 400, y: -200 }, { x: 200, y: -100 }, { x: -200, y: 100 }
         ],
-        '2': [ // Contact (Vertical shift)
+        '3': [ // Contact (Vertical shift)
             { x: 0, y: 300 }, { x: 0, y: -300 }, { x: 300, y: 0 }, { x: -300, y: 0 }
         ]
     };
@@ -242,12 +244,12 @@ function initInteractiveGradient() {
     ];
 
     window.addEventListener('set-theme', (e) => {
-        const idx = e.detail.index; // Can be -1 now
+        const idx = e.detail.index;
 
         // Hues: Hero(0), Works(30), About(190-Teal), Contact(280-Purple/Gold mix)
-        targetHue = idx === -1 ? 0 : (idx === 0 ? 30 : (idx === 1 ? 160 : 320));
+        targetHue = idx === 0 ? 0 : (idx === 1 ? 30 : (idx === 2 ? 160 : 320));
 
-        const layout = layouts[idx] || layouts['-1'];
+        const layout = layouts[idx] || layouts['0'];
 
         // Update targets (convert somewhat arbitrary "px" units to responsive logic if needed, 
         // but simple px offsets work well for subtle shifts)
@@ -327,7 +329,7 @@ function initLiquidGlassNav() {
     const indicator = document.querySelector('.nav-indicator');
     const navContainer = document.querySelector('.nav-container');
 
-    navBtns.forEach(b => b.classList.remove('active'));
+    // navBtns.forEach(b => b.classList.remove('active')); // REMOVE THIS LINE to respect HTML default
     indicator.style.opacity = '0';
 
     navBtns.forEach(btn => {
@@ -335,12 +337,20 @@ function initLiquidGlassNav() {
             if (btn.classList.contains('animating')) return;
 
             const isAlreadyActive = btn.classList.contains('active');
+
+            if (isAlreadyActive && btn.dataset.section === 'hero') {
+                return; // Do nothing if clicking active home
+            }
+
             navBtns.forEach(b => b.classList.remove('active'));
 
             if (isAlreadyActive) {
-                indicator.style.opacity = '0';
-                navigateToSection('hero');
-                window.dispatchEvent(new CustomEvent('set-theme', { detail: { index: -1 } }));
+                // If clicking an active button that isn't Home, go to Home
+                // Find Home button
+                const homeBtn = document.querySelector('.nav-btn[data-section="hero"]');
+                if (homeBtn) {
+                    homeBtn.click(); // Trigger click on home button
+                }
             } else {
                 btn.classList.add('active');
                 btn.classList.add('animating');
@@ -360,6 +370,16 @@ function initLiquidGlassNav() {
             }
         });
     });
+
+    // Initialize state from default active button in HTML
+    const activeBtn = document.querySelector('.nav-btn.active');
+    if (activeBtn) {
+        // Wait for layout
+        setTimeout(() => {
+            indicator.style.opacity = '1';
+            updateIndicator(activeBtn, false); // No animation for initial set
+        }, 100);
+    }
 
     function updateIndicator(btn, animate = true) {
         const rect = btn.getBoundingClientRect();
