@@ -38,16 +38,29 @@ jobs:
             git reset --hard origin/master
             git clean -fd
 
-            # Debug: Create a version file
-            git rev-parse HEAD > version.txt
-            chmod 644 version.txt
+            # EMERGENCY ROLLBACK & FIX
             
-            # Setup Nginx Config
-            cp zhdanov.design.conf /etc/nginx/sites-available/zhdanov.design
-            ln -sf /etc/nginx/sites-available/zhdanov.design /etc/nginx/sites-enabled/
+            # 1. Restore the default config (which likely holds the SSL setup)
+            if [ -f "/etc/nginx/sites-available/default" ]; then
+                ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+            fi
             
-            # Disable default if it exists (might be conflicting)
-            rm -f /etc/nginx/sites-enabled/default
+            # 2. Remove our broken custom config
+            rm -f /etc/nginx/sites-enabled/zhdanov.design
             
-            # Restart Nginx
-            systemctl reload nginx
+            # 3. Reload Nginx to bring site back online
+            systemctl reload nginx || systemctl restart nginx
+            
+            # 4. FIND THE REAL WEB ROOT and move our files there
+            # Extract 'root' path from standard config locations
+            REAL_ROOT=$(grep -r "root" /etc/nginx/sites-enabled/ | grep -v "#" | head -n 1 | awk '{print $2}' | sed 's/;//')
+            
+            if [ -n "$REAL_ROOT" ] && [ "$REAL_ROOT" != "/var/www/html" ]; then
+               echo "Detected real web root at: $REAL_ROOT"
+               mkdir -p "$REAL_ROOT"
+               rsync -av --delete /var/www/html/ "$REAL_ROOT/"
+               
+               # Grant permissions
+               chown -R www-data:www-data "$REAL_ROOT"
+               chmod -R 755 "$REAL_ROOT"
+            fi
