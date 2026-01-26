@@ -385,50 +385,83 @@ function initSectionNavigation() {
 }
 
 let navigationTimeout;
+let exitTimeouts = {}; // Track exit timeouts by section ID
 
 function navigateToSection(sectionId) {
     const sections = document.querySelectorAll('.section');
     const targetSection = document.getElementById(sectionId);
 
     if (!targetSection) return;
-    if (targetSection.classList.contains('active')) return;
 
-    // Clear any pending section display from rapid clicks
+    // Clear pending entry for any other section
     if (navigationTimeout) {
         clearTimeout(navigationTimeout);
         navigationTimeout = null;
     }
 
+    // Handle re-activation of a section that might be exiting
+    if (targetSection.classList.contains('active')) {
+        // If it was in the process of exiting, revive it
+        if (exitTimeouts[sectionId]) {
+            clearTimeout(exitTimeouts[sectionId]);
+            delete exitTimeouts[sectionId];
+
+            // Restore visual state immediately
+            targetSection.style.display = 'flex';
+            targetSection.style.opacity = '1';
+            targetSection.style.transform = 'translateY(0) scale(1)';
+        }
+        return;
+    }
+
     sections.forEach(section => {
-        if (section.classList.contains('active')) {
+        // If a section is active (visible or exiting), start/reset its exit
+        if (section !== targetSection && section.classList.contains('active')) {
             section.style.transition = 'opacity 0.35s ease-out, transform 0.35s ease-out';
             section.style.opacity = '0';
             section.style.transform = 'translateY(-25px) scale(0.98)';
 
-            setTimeout(() => {
+            // Restart exit timer if it exists, to ensure sync with new entry
+            if (exitTimeouts[section.id]) {
+                clearTimeout(exitTimeouts[section.id]);
+            }
+
+            exitTimeouts[section.id] = setTimeout(() => {
                 section.classList.remove('active');
                 section.style.display = 'none';
+                delete exitTimeouts[section.id];
             }, 300);
-        } else {
-            // Ensure hidden state for any section that might have been pending
-            if (section !== targetSection) {
-                section.style.display = 'none';
-                section.classList.remove('active');
-                section.style.opacity = '0';
+        } else if (section !== targetSection) {
+            // Force hide any dormant or stuck sections
+            section.style.display = 'none';
+            section.classList.remove('active');
+            section.style.opacity = '0';
+
+            if (exitTimeouts[section.id]) {
+                clearTimeout(exitTimeouts[section.id]);
+                delete exitTimeouts[section.id];
             }
         }
     });
 
+    // Schedule entry for target
     navigationTimeout = setTimeout(() => {
         targetSection.style.display = 'flex';
         targetSection.style.opacity = '0';
         targetSection.style.transform = 'translateY(25px) scale(0.98)';
         targetSection.style.transition = 'none';
-        targetSection.offsetHeight;
+        targetSection.offsetHeight; // Force reflow
+
         targetSection.style.transition = 'opacity 0.45s ease-out, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
         targetSection.classList.add('active');
         targetSection.style.opacity = '1';
         targetSection.style.transform = 'translateY(0) scale(1)';
+
+        // Ensure we don't accidentally handle it as exiting later
+        if (exitTimeouts[sectionId]) {
+            clearTimeout(exitTimeouts[sectionId]);
+            delete exitTimeouts[sectionId];
+        }
     }, 320);
 }
 
