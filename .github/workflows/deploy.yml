@@ -38,29 +38,36 @@ jobs:
             git reset --hard origin/master
             git clean -fd
 
-            # NUCLEAR OPTION: FRESH CLONE & COPY TO ALL TARGETS
+            # DEPLOYMENT REPAIR 1.4
             
-            # 1. Clean verify /var/www/html
-            rm -rf /var/www/html
-            mkdir -p /var/www/html
+            # 1. Create a safe temp directory for valid clone
+            rm -rf /tmp/portfolio_clone
+            git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git /tmp/portfolio_clone
             
-            # 2. Fresh Clone
-            git clone https://github.com/EvgexaK/Portfolio-Liquid-Glass.git /var/www/html
+            # 2. Verify we actually got the files
+            if [ ! -f "/tmp/portfolio_clone/index.html" ]; then
+                echo "CRITICAL: Git clone failed to get index.html" > /var/www/html/error.txt
+                exit 1
+            fi
             
-            # 3. Create Version File manually
-            echo "VERSION 1.3 - DEPLOYED $(date)" > /var/www/html/version.txt
-            chmod 644 /var/www/html/version.txt
+            # 3. Clean and Populate /var/www/html
+            rm -rf /var/www/html/*
+            cp -r /tmp/portfolio_clone/* /var/www/html/
             
-            # 4. Correct Permissions in /html
+            # 4. Create Debug Files
+            echo "VERSION 1.4 - REPAIRED $(date)" > /var/www/html/version.txt
+            ls -la /var/www/html/ > /var/www/html/filelist.txt
+            
+            # 5. Bruteforce Permissions (Common 403 fix)
+            # Dirs: 755, Files: 644
+            find /var/www/html -type d -exec chmod 755 {} \;
+            find /var/www/html -type f -exec chmod 644 {} \;
             chown -R www-data:www-data /var/www/html
-            chmod -R 755 /var/www/html
             
-            # 5. COPY TO ALTERNATE ROOTS (Shotgun approach)
-            # Many separate sites use /var/www/domain.com
+            # 6. Copy to alternate root just in case
             mkdir -p /var/www/zhdanov.design
             cp -r /var/www/html/* /var/www/zhdanov.design/
-            echo "VERSION 1.3 - ALTERNATE ROOT" > /var/www/zhdanov.design/version.txt
+            chown -R www-data:www-data /var/www/zhdanov.design
             
-            # 6. Ensure Nginx Default is Active (as site is up)
-            # Just reload to be safe
+            # 7. Reload
             systemctl reload nginx
