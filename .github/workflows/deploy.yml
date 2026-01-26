@@ -37,6 +37,10 @@ jobs:
             git fetch --all
             git reset --hard origin/master
             git clean -fd
+
+            # Debug: Create a version file
+            git rev-parse HEAD > version.txt
+            chmod 644 version.txt
             
             # Restart Nginx
             systemctl reload nginx
