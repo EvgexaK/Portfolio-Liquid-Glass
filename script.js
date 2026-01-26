@@ -357,6 +357,14 @@ function initLiquidGlassNav() {
                 indicator.style.opacity = '1';
                 updateIndicator(btn, true);
                 const sectionId = btn.dataset.section;
+
+                // Island Transformation Logic for About Page
+                if (sectionId === 'about') {
+                    navContainer.classList.add('expanded-island');
+                } else {
+                    navContainer.classList.remove('expanded-island');
+                }
+
                 navigateToSection(sectionId);
 
                 // Trigger Background Theme Change (Color & Pan)

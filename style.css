@@ -657,8 +657,89 @@ body {
     transition: all 0.4s var(--spring-smooth);
     /* Performance: Force GPU layer */
     transform: translateZ(0);
-    will-change: transform;
+    will-change: transform, width, height, padding;
     contain: layout style;
+}
+
+/* ========================================
+   Island Mode (About Section)
+   ======================================== */
+.nav-container.expanded-island {
+    padding: 12px 24px;
+    gap: 20px;
+    background: rgba(20, 20, 25, 0.85);
+    /* Darker solid background for card */
+    border-radius: 40px;
+    width: auto;
+    min-width: 400px;
+
+    /* Move up to center-ish or just higher */
+    transform: translateY(-80px) translateZ(0);
+
+    /* Stronger shadow */
+    box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.nav-profile {
+    display: none;
+    /* Hidden by default */
+    align-items: center;
+    gap: 12px;
+    margin-right: auto;
+    /* Push buttons to right */
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s ease;
+}
+
+.nav-container.expanded-island .nav-profile {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nav-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-name {
+    font-family: var(--font-primary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+/* Hide Home/Works/Contact labels in island mode if needed, 
+   OR keep them. User requested: Buttons - Home, Works, About, Contact. 
+   "About should be outlined". */
+
+.nav-container.expanded-island .nav-btn {
+    /* Scale down slightly perhaps? Or keep same. */
+}
+
+/* Highlight "About" button with outline when in island mode */
+.nav-container.expanded-island .nav-btn.active[data-section="about"] {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    /* Pill shape for button */
+    padding: 8px 16px;
+}
+
+.nav-container.expanded-island .nav-btn.active[data-section="about"] .nav-icon {
+    /* Maybe shift icon or keep as is */
+}
+
+/* Hide the bubble indicator in island mode if we use outline */
+.nav-container.expanded-island .nav-indicator {
+    opacity: 0 !important;
 }
 
 /* Remove decorative elements */
