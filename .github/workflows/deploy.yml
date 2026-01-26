@@ -42,5 +42,12 @@ jobs:
             git rev-parse HEAD > version.txt
             chmod 644 version.txt
             
+            # Setup Nginx Config
+            cp zhdanov.design.conf /etc/nginx/sites-available/zhdanov.design
+            ln -sf /etc/nginx/sites-available/zhdanov.design /etc/nginx/sites-enabled/
+            
+            # Disable default if it exists (might be conflicting)
+            rm -f /etc/nginx/sites-enabled/default
+            
             # Restart Nginx
             systemctl reload nginx
