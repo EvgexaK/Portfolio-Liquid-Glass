@@ -1129,3 +1129,26 @@ body {
     display: block;
     margin: 0;
 }
+
+/* ─── Loader ────────────────────────────────────────────────────────── */
+
+#loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 9999;
+    pointer-events: auto;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loader-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
