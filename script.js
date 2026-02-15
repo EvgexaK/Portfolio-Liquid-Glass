@@ -54,7 +54,8 @@ function initLanguageSwitcher() {
             "nav.home": "Home",
             "nav.works": "Works",
             "nav.about": "About",
-            "nav.contact": "Contact"
+            "nav.contact": "Contact",
+            "hero.name": "Evgenii Zhdanov"
         },
         ru: {
             "hero.line1": "Креативный",
@@ -83,7 +84,8 @@ function initLanguageSwitcher() {
             "nav.home": "Главная",
             "nav.works": "Работы",
             "nav.about": "Инфо",
-            "nav.contact": "Контакты"
+            "nav.contact": "Контакты",
+            "hero.name": "Евгений Жданов"
         }
     };
 
@@ -328,6 +330,7 @@ function initLiquidGlassNav() {
     const navBtns = document.querySelectorAll('.nav-btn');
     const indicator = document.querySelector('.nav-indicator');
     const navContainer = document.querySelector('.nav-container');
+    const navWrapper = document.querySelector('.liquid-glass-nav');
 
     // navBtns.forEach(b => b.classList.remove('active')); // REMOVE THIS LINE to respect HTML default
     indicator.style.opacity = '0';
@@ -354,15 +357,31 @@ function initLiquidGlassNav() {
             } else {
                 btn.classList.add('active');
                 btn.classList.add('animating');
-                indicator.style.opacity = '1';
-                updateIndicator(btn, true);
                 const sectionId = btn.dataset.section;
+                const isCurrentlyTopMode = navWrapper.classList.contains('nav-top-mode');
+                const willBeTopMode = sectionId === 'about';
 
-                // Island Transformation Logic for About Page
-                if (sectionId === 'about') {
-                    navContainer.classList.add('expanded-island');
+                // If mode is changing, hide indicator during transition
+                if (isCurrentlyTopMode !== willBeTopMode) {
+                    indicator.style.opacity = '0';
+
+                    if (willBeTopMode) {
+                        navWrapper.classList.add('nav-top-mode');
+                    } else {
+                        navWrapper.classList.remove('nav-top-mode');
+                    }
+
+                    // After CSS transition completes, show indicator at correct position
+                    setTimeout(() => {
+                        updateIndicator(btn, false);
+                        indicator.style.transition = 'opacity 0.3s ease';
+                        indicator.style.opacity = '1';
+                        setTimeout(() => { indicator.style.transition = ''; }, 300);
+                    }, 1200);
                 } else {
-                    navContainer.classList.remove('expanded-island');
+                    // Same mode — normal animated indicator
+                    indicator.style.opacity = '1';
+                    updateIndicator(btn, true);
                 }
 
                 navigateToSection(sectionId);
@@ -372,12 +391,27 @@ function initLiquidGlassNav() {
                 window.dispatchEvent(new CustomEvent('set-theme', { detail: { index: themeIndex } }));
 
                 addRippleEffect(btn);
+
+                // Track indicator position during layout transition
+                startIndicatorTracking(btn);
+
                 setTimeout(() => {
                     btn.classList.remove('animating');
                 }, 500);
             }
         });
     });
+
+    // Re-update indicator after profile section layout shift completes
+    function startIndicatorTracking(targetBtn) {
+        // After the profile section finishes collapsing/expanding (~600ms),
+        // silently re-position the indicator (no animation) to account
+        // for shifted button positions. The stretch animation already
+        // played on the initial click — this is just a position correction.
+        setTimeout(() => {
+            updateIndicator(targetBtn, false);
+        }, 650);
+    }
 
     // Initialize state from default active button in HTML
     const activeBtn = document.querySelector('.nav-btn.active');
@@ -393,16 +427,35 @@ function initLiquidGlassNav() {
         const rect = btn.getBoundingClientRect();
         const containerRect = navContainer.getBoundingClientRect();
         const targetLeft = rect.left - containerRect.left;
+        const isTopMode = navWrapper.classList.contains('nav-top-mode');
 
-        if (animate) {
+        if (isTopMode) {
+            // Top mode: position circle centered on button
+            const circleSize = 36;
+            const btnCenter = targetLeft + (rect.width / 2);
+            const circleLeft = btnCenter - (circleSize / 2);
+
+            if (animate) {
+                indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
+            } else {
+                indicator.style.transition = 'none';
+            }
+            indicator.style.left = `${circleLeft}px`;
+            // Width/height/border-radius handled by CSS
+            if (!animate) {
+                indicator.offsetHeight;
+                indicator.style.transition = '';
+            }
+        } else if (animate) {
             const stretchAmount = 20;
-            const stretchHeight = 8; // Height increase during animation
+            const stretchHeight = 8;
+            const hExtend = 4;
 
             indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
 
-            // Width stretch
-            indicator.style.width = `${rect.width + stretchAmount}px`;
-            indicator.style.left = `${targetLeft - (stretchAmount / 2)}px`;
+            // Width stretch (extended beyond button)
+            indicator.style.width = `${rect.width + stretchAmount + (hExtend * 2)}px`;
+            indicator.style.left = `${targetLeft - (stretchAmount / 2) - hExtend}px`;
 
             // Height stretch (make it taller)
             indicator.style.height = `calc(100% - ${12 - stretchHeight}px)`;
@@ -410,18 +463,19 @@ function initLiquidGlassNav() {
 
             setTimeout(() => {
                 indicator.style.transition = 'all 0.3s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.3s ease';
-                // Reset width
-                indicator.style.width = `${rect.width}px`;
-                indicator.style.left = `${targetLeft}px`;
+                // Reset width (still extended)
+                indicator.style.width = `${rect.width + (hExtend * 2)}px`;
+                indicator.style.left = `${targetLeft - hExtend}px`;
 
                 // Reset height
                 indicator.style.height = 'calc(100% - 12px)';
                 indicator.style.top = '6px';
             }, 250);
         } else {
+            const hExtend = 4;
             indicator.style.transition = 'none';
-            indicator.style.left = `${targetLeft}px`;
-            indicator.style.width = `${rect.width}px`;
+            indicator.style.left = `${targetLeft - hExtend}px`;
+            indicator.style.width = `${rect.width + (hExtend * 2)}px`;
             indicator.style.height = 'calc(100% - 12px)';
             indicator.style.top = '6px';
             indicator.offsetHeight;
