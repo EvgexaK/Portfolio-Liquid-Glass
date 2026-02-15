@@ -82,8 +82,19 @@ body {
 }
 
 /* ========================================
-   Interactive Gradient Background - Fluid Liquid Glass
-   Original Colors + New Morphing Shapes
+   WebGL Shader Background Canvas
+======================================== */
+#shader-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* ========================================
+   CSS Fallback Background (hidden if WebGL active)
 ======================================== */
 .gradient-bg {
     position: fixed;
@@ -102,6 +113,8 @@ body {
             #050a12 100%);
     contain: strict;
     transform: translateZ(0);
+    display: none;
+    /* Hidden by default — shown if WebGL unavailable */
 }
 
 /* Subtle underlying noise/tint */
