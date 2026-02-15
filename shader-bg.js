@@ -37,6 +37,7 @@
     uniform float u_grainOverlay;
     uniform vec2 u_resolution;
     uniform vec2 u_mouse;
+    uniform float u_offset;
 
     in vec2 v_objectUV;
     out vec4 fragColor;
@@ -106,7 +107,12 @@
         uv.y += u_distortion * center / i * cos(t + i * 2.0 * smoothstep(0.0, 1.0, uv.x));
       }
 
-      vec2 uvRotated = uv;
+
+      // Apply offset for parallax movement (gradientUV)
+      // We subtract offset so positive values move "camera" right (content left)
+      vec2 gradientUV = uv - vec2(u_offset, 0.0);
+
+      vec2 uvRotated = gradientUV;
       uvRotated -= vec2(0.5);
       float angle = 3.0 * u_swirl * radius;
       uvRotated = rotate(uvRotated, -angle);
@@ -248,6 +254,7 @@
   const uGrainMixer = gl.getUniformLocation(program, 'u_grainMixer');
   const uGrainOverlay = gl.getUniformLocation(program, 'u_grainOverlay');
   const uMouse = gl.getUniformLocation(program, 'u_mouse');
+  const uOffset = gl.getUniformLocation(program, 'u_offset');
 
   // Individual color uniforms
   const uColors = [];
@@ -265,10 +272,14 @@
 
   let currentColors = themes[0].map(c => [...c]);
   let targetColors = themes[0].map(c => [...c]);
+  let currentOffset = 0.0;
+  let targetOffset = 0.0;
 
   function setThemeColors(index) {
     const theme = themes[index] || themes[0];
     targetColors = theme.map(c => [...c]);
+    // Shift position based on index (parallax effect)
+    targetOffset = index * 0.15;
   }
 
   // Listen for section changes from nav
@@ -353,10 +364,15 @@
       }
     }
 
+
+    // Smoothly interpolate offset
+    currentOffset += (targetOffset - currentOffset) * 0.025;
+
     // Update uniforms
     gl.uniform1f(uTime, elapsed * speed);
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform2f(uMouse, mouseX + 0.5, mouseY + 0.5); // Offset by +0.5 to match the shader's uv += 0.5 logic
+    gl.uniform1f(uOffset, currentOffset);
     gl.uniform1f(uColorsCount, currentColors.length);
 
     for (let i = 0; i < MAX_COLORS; i++) {
