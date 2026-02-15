@@ -12,10 +12,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.4">
+    <link rel="stylesheet" href="style.css?v=1.5">
 </head>
 
-<body>
+<body class="loading-mode nav-hidden">
     <!-- WebGL Shader Background -->
     <canvas id="shader-bg"></canvas>
 
@@ -196,17 +196,9 @@
 
     <!-- Loader -->
     <div id="loader-overlay" class="loader-wrapper">
-        <span class="loader-letter">L</span>
-        <span class="loader-letter">o</span>
-        <span class="loader-letter">a</span>
-        <span class="loader-letter">d</span>
-        <span class="loader-letter">i</span>
-        <span class="loader-letter">n</span>
-        <span class="loader-letter">g</span>
-        <span class="loader-letter">.</span>
-        <span class="loader-letter">.</span>
-        <span class="loader-letter">.</span>
-        <div class="loader"></div>
+        <div class="loader-scaler">
+            <div class="loader"></div>
+        </div>
     </div>
 
     <script src="shader-bg.js"></script>

@@ -1,29 +1,39 @@
-/**
- * Loader Logic
- * Handles fade-out of the AI Loader
- */
-
 (function initLoader() {
     const loaderOverlay = document.getElementById('loader-overlay');
     if (!loaderOverlay) return;
 
-    // Minimum display time for the animation (2 seconds)
-    const minDisplayTime = 2000;
-    const startTime = performance.now();
+    // Minimum time the loader is visible (ms)
+    const MIN_DISPLAY = 1800;
+    const startTime = Date.now();
 
-    window.addEventListener('load', () => {
-        const elapsed = performance.now() - startTime;
-        const remaining = Math.max(0, minDisplayTime - elapsed);
+    function triggerTransition() {
+        loaderOverlay.classList.add('loaded');
 
         setTimeout(() => {
-            // Fade out
-            loaderOverlay.style.opacity = '0';
-            loaderOverlay.style.pointerEvents = 'none';
+            document.body.classList.remove('loading-mode');
+        }, 1200);
 
-            // Remove from DOM after transition
-            setTimeout(() => {
-                loaderOverlay.style.display = 'none';
-            }, 1200); // Match CSS transition duration
-        }, remaining);
-    });
+        setTimeout(() => {
+            document.body.classList.remove('nav-hidden');
+        }, 2000);
+
+        setTimeout(() => {
+            loaderOverlay.style.display = 'none';
+        }, 1600);
+    }
+
+    function onReady() {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, MIN_DISPLAY - elapsed);
+        setTimeout(triggerTransition, remaining);
+    }
+
+    // Always wait for load event even if already complete,
+    // to give the loader time to be visible
+    if (document.readyState === 'complete') {
+        // Page already loaded (cached / instant), still show loader
+        setTimeout(triggerTransition, MIN_DISPLAY);
+    } else {
+        window.addEventListener('load', onReady);
+    }
 })();
