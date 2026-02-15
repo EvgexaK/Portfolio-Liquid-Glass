@@ -545,16 +545,17 @@ body {
 ======================================== */
 .liquid-glass-nav {
     position: fixed;
+    /* Use bottom for transitioning */
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
-    /* Subtle floating animation */
+    /* Subtler floating animation suitable for both top and bottom */
     animation: navFloat 6s ease-in-out infinite;
-    /* Layout for menu + lang button */
-    /* display: flex; -> removed to allow absolute positioning relative to centered container */
     width: max-content;
-    /* Ensure centered base is just the menu */
+    /* Ensure smooth movement - Slower and smoother */
+    transition: bottom 1.2s cubic-bezier(0.25, 1, 0.5, 1), transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: bottom, transform;
 }
 
 /* Language Switch Bubble */
@@ -659,93 +660,121 @@ body {
     transform: translateZ(0);
     will-change: transform, width, height, padding;
     contain: layout style;
+    height: auto;
+    min-height: auto;
 }
 
 /* ========================================
-   Island Mode (About Section)
+   Top Mode (About Section)
    ======================================== */
-.nav-container.expanded-island {
-    padding: 12px 24px;
-    gap: 20px;
-    background: rgba(20, 20, 25, 0.85);
-    /* Darker solid background for card */
-    border-radius: 40px;
-    width: auto;
-    min-width: 400px;
-
-    /* Move up to center-ish or just higher */
-    transform: translateY(-80px) translateZ(0);
-
-    /* Stronger shadow */
-    box-shadow:
-        0 40px 80px rgba(0, 0, 0, 0.5),
-        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+.liquid-glass-nav.nav-top-mode {
+    bottom: calc(100% - 100px);
+    /* Float to top */
+    animation: none;
+    /* Disable float animation when fixed at top */
 }
 
-.nav-profile {
-    display: none;
-    /* Hidden by default */
-    align-items: center;
-    gap: 12px;
-    margin-right: auto;
-    /* Push buttons to right */
+/* Smoothly hide text labels in top mode */
+.liquid-glass-nav.nav-top-mode .nav-label {
     opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.4s ease;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    transform: scale(0.8);
+    pointer-events: none;
 }
 
-.nav-container.expanded-island .nav-profile {
+/* Ensure buttons are just icons */
+.liquid-glass-nav.nav-top-mode .nav-btn {
+    min-width: auto;
+    padding: 0;
+    width: 36px;
+    height: 36px;
     display: flex;
-    opacity: 1;
-    transform: translateX(0);
+    align-items: center;
+    justify-content: center;
 }
 
-.nav-avatar {
+/* Icon size adjustment if needed */
+.liquid-glass-nav.nav-top-mode .nav-icon {
+    width: 20px;
+    height: 20px;
+    transform: scale(1) !important;
+}
+
+.liquid-glass-nav.nav-top-mode .nav-container {
+    padding: 1px 16px 1px 1px;
+    gap: 20px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Language button matches menu style in top mode */
+.liquid-glass-nav.nav-top-mode .lang-btn {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    margin-top: -24px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Profile section - hidden from layout by default */
+.nav-profile {
+    display: none;
+    align-items: center;
+    gap: 0;
+    margin-right: 0;
+    padding-right: 0;
+    border-right: 0 solid rgba(255, 255, 255, 0.1);
+
+    /* Animation: slide in */
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-width 0.6s var(--spring-smooth),
+        opacity 0.4s ease,
+        gap 0.4s ease,
+        margin 0.4s ease;
+}
+
+.liquid-glass-nav.nav-top-mode .nav-profile {
+    display: flex;
+    max-width: 300px;
+    opacity: 1;
+    margin-right: 8px;
+    padding-right: 0;
+    gap: 10px;
 }
 
 .nav-name {
-    font-family: var(--font-primary);
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
     white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1;
 }
 
-/* Hide Home/Works/Contact labels in island mode if needed, 
-   OR keep them. User requested: Buttons - Home, Works, About, Contact. 
-   "About should be outlined". */
-
-.nav-container.expanded-island .nav-btn {
-    /* Scale down slightly perhaps? Or keep same. */
+/* Show indicator as bubbly circle in top mode */
+.liquid-glass-nav.nav-top-mode .nav-indicator {
+    border-radius: 50%;
+    width: 36px !important;
+    height: 36px !important;
+    top: 50% !important;
+    transform: translateY(-50%) translateZ(0) !important;
 }
 
-/* Highlight "About" button with outline when in island mode */
-.nav-container.expanded-island .nav-btn.active[data-section="about"] {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    /* Pill shape for button */
-    padding: 8px 16px;
-}
-
-.nav-container.expanded-island .nav-btn.active[data-section="about"] .nav-icon {
-    /* Maybe shift icon or keep as is */
-}
-
-/* Hide the bubble indicator in island mode if we use outline */
-.nav-container.expanded-island .nav-indicator {
-    opacity: 0 !important;
-}
-
-/* Remove decorative elements */
-.nav-container::before,
-.nav-container::after {
-    display: none;
+.liquid-glass-nav.nav-top-mode .nav-btn.active {
+    color: var(--color-text-primary);
 }
 
 .nav-container:hover {
@@ -833,7 +862,9 @@ body {
     letter-spacing: 0.02em;
     text-transform: capitalize;
     opacity: 0.8;
-    transition: all 0.3s var(--spring-smooth);
+    max-height: 20px;
+    transform: scale(1);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .nav-btn:hover .nav-label {
@@ -1058,4 +1089,18 @@ body {
     opacity: 0;
     transform: translateY(-40px);
     transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Force avatar dimensions to prevent squashing */
+.nav-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    display: block;
+    margin: 0;
 }
