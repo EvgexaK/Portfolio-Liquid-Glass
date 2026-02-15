@@ -1141,7 +1141,7 @@ body {
     background-color: #000;
     z-index: 9999;
     pointer-events: auto;
-    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+    transition: opacity 1.2s ease-out, visibility 1.2s ease-out, backdrop-filter 1.2s ease-out;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1162,7 +1162,7 @@ body {
     position: relative;
     z-index: 2;
     color: #fff;
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: 500;
     letter-spacing: 0.1em;
     font-family: 'Inter', sans-serif;
@@ -1202,6 +1202,15 @@ body {
 .loader-letter:nth-child(8) {
     animation-delay: 0.7s;
 }
+
+.loader-letter:nth-child(9) {
+    animation-delay: 0.8s;
+}
+
+.loader-letter:nth-child(10) {
+    animation-delay: 0.9s;
+}
+
 
 @keyframes loader-rotate {
     0% {
