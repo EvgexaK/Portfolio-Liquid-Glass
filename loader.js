@@ -23,7 +23,7 @@
             // Remove from DOM after transition
             setTimeout(() => {
                 loaderOverlay.style.display = 'none';
-            }, 800); // Match CSS transition duration
+            }, 1200); // Match CSS transition duration
         }, remaining);
     });
 })();
