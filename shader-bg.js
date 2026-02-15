@@ -89,7 +89,7 @@
 
       // Use uncorrected UV for the main algorithm (matches paper-design behavior)
       uv += 0.5;
-      vec2 grainUV = uv * 1500.0;
+      vec2 grainUV = uv * 2200.0;
 
       float grain = noise(grainUV, vec2(0.0));
       float mixerGrain = 0.4 * u_grainMixer * (grain - 0.5);
@@ -258,8 +258,8 @@
   // Set static uniforms
   gl.uniform1f(uDistortion, 0.4);
   gl.uniform1f(uSwirl, 0.2);
-  gl.uniform1f(uGrainMixer, 0.12);
-  gl.uniform1f(uGrainOverlay, 0.08);
+  gl.uniform1f(uGrainMixer, 0.06);
+  gl.uniform1f(uGrainOverlay, 0.04);
 
   // ─── Color State ────────────────────────────────────────────────
 
@@ -326,7 +326,12 @@
     // If v_objectUV.y is 0 at top, and 1 at bottom.
     // e.clientY / h is 0 at top, 1 at bottom.
     // So direct mapping is correct.
-    targetMouseY = e.clientY / window.innerHeight;
+    const rawY = e.clientY / window.innerHeight;
+    const rawX = e.clientX / window.innerWidth;
+
+    // Dampened range: keep distortion center closer to middle
+    targetMouseX = 0.5 + (rawX - 0.5) * 0.5;
+    targetMouseY = 0.5 + (rawY - 0.5) * 0.5;
   });
 
   // ─── Animation Loop ─────────────────────────────────────────────
@@ -337,9 +342,9 @@
   function render() {
     const elapsed = (performance.now() - startTime) / 1000.0;
 
-    // Smooth lerp mouse
-    mouseX += (targetMouseX - mouseX) * 0.05;
-    mouseY += (targetMouseY - mouseY) * 0.05;
+    // Smooth lerp mouse (Very smooth/heavy feel)
+    mouseX += (targetMouseX - mouseX) * 0.02;
+    mouseY += (targetMouseY - mouseY) * 0.02;
 
     // Smoothly interpolate colors
     for (let i = 0; i < currentColors.length; i++) {
