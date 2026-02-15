@@ -90,7 +90,7 @@
 
       // Use uncorrected UV for the main algorithm (matches paper-design behavior)
       uv += 0.5;
-      vec2 grainUV = uv * 2200.0;
+      vec2 grainUV = uv * 3500.0;
 
       float grain = noise(grainUV, vec2(0.0));
       float mixerGrain = 0.4 * u_grainMixer * (grain - 0.5);
@@ -265,8 +265,8 @@
   // Set static uniforms
   gl.uniform1f(uDistortion, 0.4);
   gl.uniform1f(uSwirl, 0.2);
-  gl.uniform1f(uGrainMixer, 0.06);
-  gl.uniform1f(uGrainOverlay, 0.04);
+  gl.uniform1f(uGrainMixer, 0.045);
+  gl.uniform1f(uGrainOverlay, 0.03);
 
   // ─── Color State ────────────────────────────────────────────────
 
