@@ -1038,6 +1038,20 @@ body {
         grid-template-columns: 1fr;
     }
 
+    /* Hide language button on mobile - doesn't fit */
+    .lang-btn {
+        display: none;
+    }
+
+    /* Make top-mode menu take full width on mobile */
+    .liquid-glass-nav.nav-top-mode {
+        width: calc(100% - 32px);
+    }
+
+    .liquid-glass-nav.nav-top-mode .nav-container {
+        width: 100%;
+    }
+
     :root {
         --glass-blur: 40px;
     }
@@ -1046,19 +1060,17 @@ body {
 @media (max-width: 480px) {
     .liquid-glass-nav {
         bottom: 24px;
-        width: auto;
-        transform: translateX(-50%) scale(0.85);
-        transform-origin: bottom center;
+        width: calc(100% - 32px);
+        max-width: 100vw;
     }
 
     .nav-container {
-        width: 100%;
         justify-content: space-around;
     }
 
     .nav-btn {
-        padding: 8px 36px;
-        flex: initial;
+        padding: 6px 12px;
+        flex: 1;
     }
 
     :root {
