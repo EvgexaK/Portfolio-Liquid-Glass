@@ -29,7 +29,7 @@
   const fragmentPrefix = isMobile ? '#version 300 es\n#define IS_MOBILE\n' : '#version 300 es\n';
 
   const fragmentSourceBody = `
-    precision mediump float;
+    precision highp float;
 
     #define TWO_PI 6.28318530718
     #define PI 3.14159265358979323846
@@ -98,8 +98,8 @@
       uv += 0.5;
 
       #ifdef IS_MOBILE
-        // Lower grain frequency on mobile to avoid aliasing artifacts
-        vec2 grainUV = uv * 1400.0;
+        // Lower grain frequency on mobile to avoid aliasing artifacts, but keep it high enough to look like texture
+        vec2 grainUV = uv * 2000.0;
       #else
         vec2 grainUV = uv * 3500.0;
       #endif
@@ -317,7 +317,7 @@
   function resize() {
     // Optimization: Cap DPR to 1 on mobile to prevent excessive GPU load/lag.
     // On PC, allow up to 2 for crispness.
-    const maxDpr = isMobile ? 1.0 : 2.0;
+    const maxDpr = isMobile ? 1.5 : 2.0;
     const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
 
     const w = window.innerWidth;
