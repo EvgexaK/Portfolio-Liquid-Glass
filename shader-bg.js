@@ -36,6 +36,7 @@
     uniform float u_grainMixer;
     uniform float u_grainOverlay;
     uniform vec2 u_resolution;
+    uniform vec2 u_mouse;
 
     in vec2 v_objectUV;
     out vec4 fragColor;
@@ -88,7 +89,7 @@
 
       // Use uncorrected UV for the main algorithm (matches paper-design behavior)
       uv += 0.5;
-      vec2 grainUV = uv * 3500.0;
+      vec2 grainUV = uv * 1500.0;
 
       float grain = noise(grainUV, vec2(0.0));
       float mixerGrain = 0.4 * u_grainMixer * (grain - 0.5);
@@ -96,7 +97,7 @@
       const float firstFrameOffset = 41.5;
       float t = 0.5 * (u_time + firstFrameOffset);
 
-      float radius = smoothstep(0.0, 1.0, length(uv - 0.5));
+      float radius = smoothstep(0.0, 1.0, length(uv - u_mouse));
       float center = 1.0 - radius;
 
       for (float i = 1.0; i <= 2.0; i++) {
@@ -246,6 +247,7 @@
   const uSwirl = gl.getUniformLocation(program, 'u_swirl');
   const uGrainMixer = gl.getUniformLocation(program, 'u_grainMixer');
   const uGrainOverlay = gl.getUniformLocation(program, 'u_grainOverlay');
+  const uMouse = gl.getUniformLocation(program, 'u_mouse');
 
   // Individual color uniforms
   const uColors = [];
@@ -290,6 +292,43 @@
   resize();
   window.addEventListener('resize', resize);
 
+  // ─── Mouse Tracking ─────────────────────────────────────────────
+
+  let mouseX = 0.5;
+  let mouseY = 0.5;
+  let targetMouseX = 0.5;
+  let targetMouseY = 0.5;
+
+  window.addEventListener('mousemove', (e) => {
+    // Normalize mouse position (0.0 to 1.0)
+    // Note: Shader UVs have (0,0) at bottom-left? 
+    // Wait, vertex shader says: v_objectUV.y = 1.0 - v_objectUV.y;
+    // So (0,0) is top-left in UV space after flip?
+    // Let's check: 
+    // v_objectUV = a_position * 0.5 + 0.5; // (-1..1) -> (0..1)
+    // v_objectUV.y = 1.0 - v_objectUV.y; // Flip Y
+    // So 0,0 is top-left.
+    // Mouse clientY 0 is top. 
+    // So straightforward mapping:
+    targetMouseX = e.clientX / window.innerWidth;
+    targetMouseY = 1.0 - (e.clientY / window.innerHeight); // Flip Y to match GL coords (0 at bottom)
+
+    // Actually, if we want it to match the visual "top-left" of the screen, we need to match the UV coordinates.
+    // The vertex shader flips Y!
+    // v_objectUV.y = 1.0 - v_objectUV.y;
+    // So v_objectUV.y = 0.0 is top.
+    // If I pass u_mouse.y = 0.0, it should be top.
+    // e.clientY / height is 0.0 at top.
+    // So NO flip needed here if the shader uses standard top-left UVs.
+    // ... wait.
+    // Fragment shader: uv += 0.5. The coordinates are shifted.
+    // Let's assume standard GL behavior (0 at bottom) but vertex shader flips it.
+    // If v_objectUV.y is 0 at top, and 1 at bottom.
+    // e.clientY / h is 0 at top, 1 at bottom.
+    // So direct mapping is correct.
+    targetMouseY = e.clientY / window.innerHeight;
+  });
+
   // ─── Animation Loop ─────────────────────────────────────────────
 
   const startTime = performance.now();
@@ -297,6 +336,10 @@
 
   function render() {
     const elapsed = (performance.now() - startTime) / 1000.0;
+
+    // Smooth lerp mouse
+    mouseX += (targetMouseX - mouseX) * 0.05;
+    mouseY += (targetMouseY - mouseY) * 0.05;
 
     // Smoothly interpolate colors
     for (let i = 0; i < currentColors.length; i++) {
@@ -308,6 +351,7 @@
     // Update uniforms
     gl.uniform1f(uTime, elapsed * speed);
     gl.uniform2f(uResolution, canvas.width, canvas.height);
+    gl.uniform2f(uMouse, mouseX + 0.5, mouseY + 0.5); // Offset by +0.5 to match the shader's uv += 0.5 logic
     gl.uniform1f(uColorsCount, currentColors.length);
 
     for (let i = 0; i < MAX_COLORS; i++) {
