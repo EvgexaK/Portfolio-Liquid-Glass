@@ -7,6 +7,9 @@
 (function () {
   'use strict';
 
+  // ─── Mobile Detection ───────────────────────────────────────────
+  const isMobile = window.innerWidth < 768;
+
   // ─── GLSL Shaders ───────────────────────────────────────────────
 
   const vertexSource = `#version 300 es
@@ -22,7 +25,10 @@
 
   const MAX_COLORS = 10;
 
-  const fragmentSource = `#version 300 es
+  // Inject define for mobile optimizations
+  const fragmentPrefix = isMobile ? '#version 300 es\n#define IS_MOBILE\n' : '#version 300 es\n';
+
+  const fragmentSourceBody = `
     precision mediump float;
 
     #define TWO_PI 6.28318530718
@@ -90,7 +96,13 @@
 
       // Use uncorrected UV for the main algorithm (matches paper-design behavior)
       uv += 0.5;
-      vec2 grainUV = uv * 3500.0;
+
+      #ifdef IS_MOBILE
+        // Lower grain frequency on mobile to avoid aliasing artifacts
+        vec2 grainUV = uv * 1400.0;
+      #else
+        vec2 grainUV = uv * 3500.0;
+      #endif
 
       float grain = noise(grainUV, vec2(0.0));
       float mixerGrain = 0.4 * u_grainMixer * (grain - 0.5);
@@ -101,15 +113,20 @@
       float radius = smoothstep(0.0, 1.0, length(uv - u_mouse));
       float center = 1.0 - radius;
 
-      for (float i = 1.0; i <= 2.0; i++) {
-        uv.x += u_distortion * center / i * sin(t + i * 0.4 * smoothstep(0.0, 1.0, uv.y))
-                 * cos(0.2 * t + i * 2.4 * smoothstep(0.0, 1.0, uv.y));
-        uv.y += u_distortion * center / i * cos(t + i * 2.0 * smoothstep(0.0, 1.0, uv.x));
-      }
-
+      // Reduce distortion complexity loop on mobile
+      #ifdef IS_MOBILE
+        uv.x += u_distortion * center * sin(t + 0.4 * smoothstep(0.0, 1.0, uv.y))
+                 * cos(0.2 * t + 2.4 * smoothstep(0.0, 1.0, uv.y));
+        uv.y += u_distortion * center * cos(t + 2.0 * smoothstep(0.0, 1.0, uv.x));
+      #else
+        for (float i = 1.0; i <= 2.0; i++) {
+          uv.x += u_distortion * center / i * sin(t + i * 0.4 * smoothstep(0.0, 1.0, uv.y))
+                   * cos(0.2 * t + i * 2.4 * smoothstep(0.0, 1.0, uv.y));
+          uv.y += u_distortion * center / i * cos(t + i * 2.0 * smoothstep(0.0, 1.0, uv.x));
+        }
+      #endif
 
       // Apply offset for parallax movement (gradientUV)
-      // We subtract offset so positive values move "camera" right (content left)
       vec2 gradientUV = uv - vec2(u_offset, 0.0);
 
       vec2 uvRotated = gradientUV;
@@ -140,10 +157,16 @@
       color /= max(1e-4, totalWeight);
       opacity /= max(1e-4, totalWeight);
 
-      // Grain overlay
-      float grainOverlay = valueNoise(rotate(grainUV, 1.0) + vec2(3.0));
-      grainOverlay = mix(grainOverlay, valueNoise(rotate(grainUV, 2.0) + vec2(-1.0)), 0.5);
-      grainOverlay = pow(grainOverlay, 1.3);
+      // Grain overlay - Disable heavy double-noise lookup on mobile
+      #ifdef IS_MOBILE
+        // Simpler single-pass noise for mobile overlay
+        float grainOverlay = valueNoise(rotate(grainUV, 1.0) + vec2(3.0));
+        grainOverlay = pow(grainOverlay, 1.3);
+      #else
+        float grainOverlay = valueNoise(rotate(grainUV, 1.0) + vec2(3.0));
+        grainOverlay = mix(grainOverlay, valueNoise(rotate(grainUV, 2.0) + vec2(-1.0)), 0.5);
+        grainOverlay = pow(grainOverlay, 1.3);
+      #endif
 
       float grainOverlayV = grainOverlay * 2.0 - 1.0;
       vec3 grainOverlayColor = vec3(step(0.0, grainOverlayV));
@@ -157,6 +180,8 @@
       fragColor = vec4(color, opacity);
     }
   `;
+
+  const fragmentSource = fragmentPrefix + fragmentSourceBody;
 
   // ─── Color Themes ───────────────────────────────────────────────
 
@@ -290,7 +315,11 @@
   // ─── Resize ─────────────────────────────────────────────────────
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
+    // Optimization: Cap DPR to 1 on mobile to prevent excessive GPU load/lag.
+    // On PC, allow up to 2 for crispness.
+    const maxDpr = isMobile ? 1.0 : 2.0;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+
     const w = window.innerWidth;
     const h = window.innerHeight;
     canvas.width = w * dpr;
@@ -311,36 +340,10 @@
   let targetMouseY = 0.5;
 
   window.addEventListener('mousemove', (e) => {
-    // Normalize mouse position (0.0 to 1.0)
-    // Note: Shader UVs have (0,0) at bottom-left? 
-    // Wait, vertex shader says: v_objectUV.y = 1.0 - v_objectUV.y;
-    // So (0,0) is top-left in UV space after flip?
-    // Let's check: 
-    // v_objectUV = a_position * 0.5 + 0.5; // (-1..1) -> (0..1)
-    // v_objectUV.y = 1.0 - v_objectUV.y; // Flip Y
-    // So 0,0 is top-left.
-    // Mouse clientY 0 is top. 
-    // So straightforward mapping:
-    targetMouseX = e.clientX / window.innerWidth;
-    targetMouseY = 1.0 - (e.clientY / window.innerHeight); // Flip Y to match GL coords (0 at bottom)
-
-    // Actually, if we want it to match the visual "top-left" of the screen, we need to match the UV coordinates.
-    // The vertex shader flips Y!
-    // v_objectUV.y = 1.0 - v_objectUV.y;
-    // So v_objectUV.y = 0.0 is top.
-    // If I pass u_mouse.y = 0.0, it should be top.
-    // e.clientY / height is 0.0 at top.
-    // So NO flip needed here if the shader uses standard top-left UVs.
-    // ... wait.
-    // Fragment shader: uv += 0.5. The coordinates are shifted.
-    // Let's assume standard GL behavior (0 at bottom) but vertex shader flips it.
-    // If v_objectUV.y is 0 at top, and 1 at bottom.
-    // e.clientY / h is 0 at top, 1 at bottom.
-    // So direct mapping is correct.
+    // Dampened range: keep distortion center closer to middle
     const rawY = e.clientY / window.innerHeight;
     const rawX = e.clientX / window.innerWidth;
 
-    // Dampened range: keep distortion center closer to middle
     targetMouseX = 0.5 + (rawX - 0.5) * 0.5;
     targetMouseY = 0.5 + (rawY - 0.5) * 0.5;
   });
