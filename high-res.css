@@ -1,0 +1,71 @@
+/* ========================================
+   High Resolution (4K+) Support
+======================================== */
+@media (min-width: 1921px) {
+    :root {
+        /* Scale spacing for large screens */
+        --spacing-xs: clamp(0.75rem, 0.5vw, 1.5rem);
+        --spacing-sm: clamp(1rem, 1vw, 2.5rem);
+        --spacing-md: clamp(1.5rem, 1.5vw, 4rem);
+        --spacing-lg: clamp(2rem, 2vw, 5rem);
+        --spacing-xl: clamp(3rem, 3vw, 8rem);
+        --spacing-2xl: clamp(5rem, 5vw, 14rem);
+    }
+
+    /* Relax max-width constraints */
+    .hero-content {
+        max-width: 85vw;
+    }
+
+    .section-content {
+        max-width: 80vw;
+    }
+
+    .about-content {
+        max-width: 55vw;
+    }
+
+    .contact-content {
+        max-width: 45vw;
+    }
+
+    /* Scale contents */
+    .hero-title {
+        /* Adjusted to prevent vertical overflow on QHD */
+        font-size: clamp(10rem, 10vw, 24rem);
+        margin-bottom: var(--spacing-xl);
+        /* Reduce margin bottom specifically for layout tightness */
+    }
+
+    .hero-avatar {
+        /* Adjusted width/height to fit 1440p height better */
+        width: clamp(450px, 20vw, 1000px);
+        height: clamp(600px, 30vw, 1400px);
+    }
+
+    .section-title {
+        font-size: clamp(5rem, 9vw, 8rem);
+    }
+
+    .about-text,
+    .contact-text {
+        font-size: clamp(1.5rem, 1.3vw, 2.5rem);
+    }
+
+    .work-title {
+        font-size: clamp(2.5rem, 2vw, 4rem);
+    }
+
+    .work-desc {
+        font-size: clamp(1.2rem, 1vw, 2rem);
+    }
+
+    .skill-tag {
+        font-size: clamp(1.2rem, 1vw, 1.8rem);
+        padding: 1rem 2rem;
+    }
+
+    .contact-email {
+        font-size: clamp(3rem, 5vw, 5rem);
+    }
+}
