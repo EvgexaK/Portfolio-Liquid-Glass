@@ -212,6 +212,33 @@ body {
     100% {
         border-radius: 60% 30% 60% 40% / 40% 50% 60% 30%;
     }
+
+    100% {
+        border-radius: 60% 30% 60% 40% / 40% 50% 60% 30%;
+    }
+}
+
+/* Organic Morph for Avatar Wrapper */
+@keyframes morphOrganic {
+    0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+
+    25% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+
+    50% {
+        border-radius: 60% 30% 60% 40% / 40% 50% 60% 30%;
+    }
+
+    75% {
+        border-radius: 40% 60% 30% 60% / 60% 30% 70% 40%;
+    }
+
+    100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
 }
 
 /* Slow Floating Animations to break circular movement */
@@ -358,9 +385,14 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
 
-    /* Interactive Window Styles */
-    transform-style: preserve-3d;
-    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    /* Interactive Window Styles REMOVED - Replaced with Organic Animation */
+    /* transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); */
+
+    /* Animation: Organic Morph */
+    animation: morphOrganic 12s ease-in-out infinite;
+    will-change: border-radius;
+
     transition: transform 0.2s ease-out;
     box-shadow:
         0 40px 80px rgba(0, 0, 0, 0.4),
