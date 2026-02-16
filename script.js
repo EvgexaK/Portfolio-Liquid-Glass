@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidGlassNav();
     initSectionNavigation();
     initLanguageSwitcher();
+    initHeroAvatarTilt();
 });
 
 /**
@@ -33,7 +34,7 @@ function initLanguageSwitcher() {
             "hero.role": "WEB & MOBILE / PRINTED PRODUCT / BRANDING",
             "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
             "hero.based.label": "BASED",
-            "hero.based.city": "IN CHEREPOVETS",
+            "hero.based.city": "IN CHEREPOVETS, RUSSIA",
             "works.title": "Selected Works",
             "works.1.title": "Brand Identity",
             "works.1.desc": "Complete visual identity for tech startup",
@@ -63,7 +64,7 @@ function initLanguageSwitcher() {
             "hero.role": "ВЕБ & МОБАЙЛ / ПЕЧАТНАЯ ПРОДУКЦИЯ / БРЕНДИНГ",
             "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
             "hero.based.label": "ЛОКАЦИЯ",
-            "hero.based.city": "ЧЕРЕПОВЕЦ",
+            "hero.based.city": "ЧЕРЕПОВЕЦ, РОССИЯ",
             "works.title": "Избранные проекты",
             "works.1.title": "Айдентика бренда",
             "works.1.desc": "Полный визуальный стиль для стартапа",
@@ -497,6 +498,56 @@ window.addEventListener('resize', debounce(() => {
         indicator.style.transition = '';
     }
 }, 100));
+
+
+/**
+ * Hero Avatar Interactive Tilt
+ * Adds a premium 3D window effect with reflections
+ */
+function initHeroAvatarTilt() {
+    const avatarWrapper = document.querySelector('.hero-avatar-wrapper');
+    if (!avatarWrapper) return;
+
+    // Only run on desktop
+    if (window.innerWidth <= 768) return;
+
+    const handleMouseMove = (e) => {
+        const rect = avatarWrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Calculate rotation (max 10 degrees)
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -8;
+        const rotateY = ((x - centerX) / centerX) * 8;
+
+        // Calculate glare position (invert for reflection feel)
+        const glareX = (x / rect.width) * 100;
+        const glareY = (y / rect.height) * 100;
+
+        // Apply to CSS variables
+        avatarWrapper.style.setProperty('--rx', `${rotateX}deg`);
+        avatarWrapper.style.setProperty('--ry', `${rotateY}deg`);
+        avatarWrapper.style.setProperty('--gx', `${glareX}%`);
+        avatarWrapper.style.setProperty('--gy', `${glareY}%`);
+    };
+
+    const handleMouseLeave = () => {
+        avatarWrapper.style.setProperty('--rx', '0deg');
+        avatarWrapper.style.setProperty('--ry', '0deg');
+        // Reset glare to center softly
+        avatarWrapper.style.transition = 'transform 0.5s ease, --rx 0.5s ease, --ry 0.5s ease';
+        setTimeout(() => {
+            avatarWrapper.style.transition = 'transform 0.2s ease-out';
+        }, 500);
+    };
+
+    // Use parent section for wider trigger area if desired, 
+    // but the wrapper itself is usually cleaner for direct interaction
+    avatarWrapper.addEventListener('mousemove', handleMouseMove);
+    avatarWrapper.addEventListener('mouseleave', handleMouseLeave);
+}
 
 /**
  * Prefers reduced motion support

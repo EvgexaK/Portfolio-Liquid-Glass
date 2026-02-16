@@ -335,6 +335,74 @@ body {
     width: 100%;
 }
 
+.hero-main-layout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Push to right but keep tight */
+    gap: var(--spacing-xl);
+    width: 100%;
+    position: relative;
+    padding-right: 5vw;
+    /* Breathing room from edge */
+}
+
+.hero-avatar-wrapper {
+    flex-shrink: 0;
+    position: relative;
+    padding: 1px;
+    /* Rim border */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.0) 100%);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    /* Organic Blob Shape */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    /* Interactive Window Styles */
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.2s ease-out;
+    box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+
+    /* Positioning Refined (matching screenshot) */
+    margin-left: -5vw;
+    margin-top: 2vh;
+}
+
+.hero-avatar-glare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%),
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0.05) 20%,
+            transparent 50%);
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: overlay;
+    transform: translate(-25%, -25%);
+}
+
+.hero-avatar {
+    width: clamp(280px, 25vw, 450px);
+    height: clamp(380px, 35vw, 650px);
+    /* Taller aspect ratio */
+    border-radius: inherit;
+    object-fit: cover;
+    object-position: 70% center;
+    /* Keep face well-presented based on reference */
+    display: block;
+    position: relative;
+    z-index: 1;
+    filter: contrast(1.05) brightness(0.95);
+    transition: transform 0.2s ease-out;
+}
+
 .hero-title {
     font-family: var(--font-primary);
     font-weight: 300;
@@ -342,6 +410,7 @@ body {
     line-height: 0.95;
     letter-spacing: -0.03em;
     margin-bottom: var(--spacing-2xl);
+    flex: 1;
 }
 
 .title-line {
@@ -999,6 +1068,34 @@ body {
    Responsive Design
 ======================================== */
 @media (max-width: 768px) {
+    .hero-main-layout {
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--spacing-xl);
+        margin-top: 0;
+        text-align: center;
+    }
+
+    .hero-avatar {
+        width: clamp(250px, 70vw, 350px);
+        height: clamp(300px, 85vw, 450px);
+        border-radius: inherit;
+    }
+
+    .hero-avatar-wrapper {
+        order: 2;
+        /* Move avatar below text */
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: none !important;
+        /* Disable tilt on mobile for better UX */
+        margin-left: 0;
+        margin-top: var(--spacing-lg);
+    }
+
+    .hero-content {
+        order: 1;
+    }
+
     .hero-title {
         /* Maximize width usage */
         font-size: clamp(3.5rem, 17vw, 6rem);
@@ -1015,6 +1112,7 @@ body {
     .hero-info {
         flex-direction: column;
         gap: var(--spacing-md);
+        align-items: center;
     }
 
     .nav-container {
@@ -1203,8 +1301,9 @@ body.loading-mode .liquid-glass-nav {
     transition: none !important;
 }
 
-/* Text Elements - Initial Hidden State */
-body.loading-mode [data-i18n] {
+/* Text Elements & Avatar - Initial Hidden State */
+body.loading-mode [data-i18n],
+body.loading-mode .hero-avatar-wrapper {
     opacity: 0;
     filter: blur(10px);
     transform: translateY(15px) scale(0.95);
@@ -1213,7 +1312,8 @@ body.loading-mode [data-i18n] {
 }
 
 /* Reveal Transition (Normal State) */
-[data-i18n] {
+[data-i18n],
+.hero-avatar-wrapper {
     transition:
         opacity 1.2s ease-out,
         filter 1.2s ease-out,
@@ -1247,6 +1347,11 @@ body.loading-mode [data-i18n] {
 
 .hero-info .info-group:nth-child(2) .info-value {
     transition-delay: 1.1s;
+}
+
+.hero-avatar-wrapper {
+    transition-delay: 1.3s;
+    /* Reveals last, matching text flow */
 }
 
 /* Separate state for Nav to allow timed reveal */
