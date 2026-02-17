@@ -44,6 +44,7 @@
     uniform vec2 u_resolution;
     uniform vec2 u_mouse;
     uniform float u_offset;
+    uniform float u_scroll; // New uniform
 
     in vec2 v_objectUV;
     out vec4 fragColor;
@@ -96,6 +97,11 @@
 
       // Use uncorrected UV for the main algorithm (matches paper-design behavior)
       uv += 0.5;
+      
+      // Scroll Interaction: Shift UVs slightly based on scroll to create a "parallax" or "flow" feel
+      // u_scroll is in pixels, so scale it down significantly
+      float scrollOffset = u_scroll * 0.0002; 
+      uv.y -= scrollOffset; // Move background up as we scroll down
 
       #ifdef IS_MOBILE
         // Lower grain frequency on mobile to avoid aliasing artifacts, but keep it high enough to look like texture
@@ -109,6 +115,9 @@
 
       const float firstFrameOffset = 41.5;
       float t = 0.5 * (u_time + firstFrameOffset);
+      
+      // Also affect time with scroll for a bit of speed-up/warp
+      t += scrollOffset * 0.5;
 
       float radius = smoothstep(0.0, 1.0, length(uv - u_mouse));
       float center = 1.0 - radius;
@@ -280,6 +289,7 @@
   const uGrainOverlay = gl.getUniformLocation(program, 'u_grainOverlay');
   const uMouse = gl.getUniformLocation(program, 'u_mouse');
   const uOffset = gl.getUniformLocation(program, 'u_offset');
+  const uScroll = gl.getUniformLocation(program, 'u_scroll'); // Get location
 
   // Individual color uniforms
   const uColors = [];
@@ -376,6 +386,7 @@
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform2f(uMouse, mouseX + 0.5, mouseY + 0.5); // Offset by +0.5 to match the shader's uv += 0.5 logic
     gl.uniform1f(uOffset, currentOffset);
+    gl.uniform1f(uScroll, window.liquidScrollY || window.scrollY || 0); // Pass smoothed scroll
     gl.uniform1f(uColorsCount, currentColors.length);
 
     for (let i = 0; i < MAX_COLORS; i++) {

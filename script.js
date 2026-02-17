@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSectionNavigation();
     initLanguageSwitcher();
     initLanguageSwitcher();
+    initTimeline();
 });
 
 /**
@@ -23,71 +24,10 @@ function initLanguageSwitcher() {
     const isRussian = browserLang.toLowerCase().startsWith('ru');
 
     // Set initial language based on browser preference
+    // Set initial language based on browser preference
     let currentLang = isRussian ? 'ru' : 'en';
 
-    // Translation Dictionary
-    const translations = {
-        en: {
-            "hero.line1": "Creative",
-            "hero.line2": "visual",
-            "hero.line3": "designer",
-            "hero.role": "WEB & MOBILE / PRINTED PRODUCT / BRANDING",
-            "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
-            "hero.based.label": "BASED",
-            "hero.based.city": "CHEREPOVETS, RUSSIA",
-            "works.title": "Selected Works",
-            "works.1.title": "Brand Identity",
-            "works.1.desc": "Complete visual identity for tech startup",
-            "works.2.title": "Mobile App",
-            "works.2.desc": "iOS & Android wellness application",
-            "works.3.title": "Web Platform",
-            "works.3.desc": "E-commerce experience redesign",
-            "about.title": "About Me",
-            "about.text": "I'm a creative visual designer with over 8 years of experience crafting digital experiences that blend aesthetics with functionality. My passion lies in creating designs that not only look beautiful but also tell compelling stories.",
-            "skills.1": "UI/UX Design",
-            "skills.2": "Brand Identity",
-            "skills.3": "Motion Design",
-            "skills.4": "Prototyping",
-            "skills.5": "Design Systems",
-            "contact.title": "Get in Touch",
-            "contact.text": "Ready to bring your vision to life? Let's create something amazing together.",
-            "nav.home": "Home",
-            "nav.works": "Works",
-            "nav.about": "About",
-            "nav.contact": "Contact",
-            "hero.name": "Evgenii Zhdanov"
-        },
-        ru: {
-            "hero.line1": "Креативный",
-            "hero.line2": "визуальный",
-            "hero.line3": "дизайнер",
-            "hero.role": "ВЕБ & МОБАЙЛ / ПЕЧАТНАЯ ПРОДУКЦИЯ / БРЕНДИНГ",
-            "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
-            "hero.based.label": "ЛОКАЦИЯ",
-            "hero.based.city": "ЧЕРЕПОВЕЦ, РОССИЯ",
-            "works.title": "Избранные проекты",
-            "works.1.title": "Айдентика бренда",
-            "works.1.desc": "Полный визуальный стиль для стартапа",
-            "works.2.title": "Мобильное приложение",
-            "works.2.desc": "iOS & Android приложение для здоровья",
-            "works.3.title": "Веб-платформа",
-            "works.3.desc": "Редизайн e-commerce опыта",
-            "about.title": "Обо мне",
-            "about.text": "Я креативный дизайнер с более чем 8-летним опытом создания цифровых продуктов, сочетающих эстетику и функциональность. Моя страсть — создавать дизайн, который не только красив, но и рассказывает историю.",
-            "skills.1": "UI/UX Дизайн",
-            "skills.2": "Брендинг",
-            "skills.3": "Моушн-дизайн",
-            "skills.4": "Прототипирование",
-            "skills.5": "Дизайн-системы",
-            "contact.title": "Связаться",
-            "contact.text": "Готовы воплотить идеи в жизнь? Давайте создадим что-то удивительное вместе.",
-            "nav.home": "Главная",
-            "nav.works": "Работы",
-            "nav.about": "Инфо",
-            "nav.contact": "Контакты",
-            "hero.name": "Евгений Жданов"
-        }
-    };
+    // ... (rest of language switcher logic moved down or preserved) ...
 
     const ruFlag = `
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,6 +117,196 @@ function initLanguageSwitcher() {
             }
         });
     }
+
+    // ─── Constants & Config ──────────────────────────────────────────
+    const translations = {
+        en: {
+            "hero.line1": "Creative",
+            "hero.line2": "visual",
+            "hero.line3": "designer",
+            "hero.role": "WEB & MOBILE / PRINTED PRODUCT / BRANDING",
+            "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
+            "hero.based.label": "BASED",
+            "hero.based.city": "CHEREPOVETS, RUSSIA",
+            "works.title": "Selected Works",
+            "works.1.title": "Brand Identity",
+            "works.1.desc": "Complete visual identity for tech startup",
+            "works.2.title": "Mobile App",
+            "works.2.desc": "iOS & Android wellness application",
+            "works.3.title": "Web Platform",
+            "works.3.desc": "E-commerce experience redesign",
+            "about.title": "About Me",
+            "about.text": "I'm a creative visual designer with over 8 years of experience crafting digital experiences that blend aesthetics with functionality. My passion lies in creating designs that not only look beautiful but also tell compelling stories.",
+            "skills.1": "UI/UX Design",
+            "skills.2": "Brand Identity",
+            "skills.3": "Motion Design",
+            "skills.4": "Prototyping",
+            "skills.5": "Design Systems",
+            "contact.title": "Get in Touch",
+            "contact.text": "Ready to bring your vision to life? Let's create something amazing together.",
+            "nav.home": "Home",
+            "nav.works": "Works",
+            "nav.about": "About",
+            "nav.contact": "Contact",
+            "hero.name": "Evgenii Zhdanov"
+        },
+        ru: {
+            "hero.line1": "Креативный",
+            "hero.line2": "визуальный",
+            "hero.line3": "дизайнер",
+            "hero.role": "ВЕБ & МОБАЙЛ / ПЕЧАТНАЯ ПРОДУКЦИЯ / БРЕНДИНГ",
+            "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
+            "hero.based.label": "ЛОКАЦИЯ",
+            "hero.based.city": "ЧЕРЕПОВЕЦ, РОССИЯ",
+            "works.title": "Избранные проекты",
+            "works.1.title": "Айдентика бренда",
+            "works.1.desc": "Полный визуальный стиль для стартапа",
+            "works.2.title": "Мобильное приложение",
+            "works.2.desc": "iOS & Android приложение для здоровья",
+            "works.3.title": "Веб-платформа",
+            "works.3.desc": "Редизайн e-commerce опыта",
+            "about.title": "Обо мне",
+            "about.text": "Я креативный дизайнер с более чем 8-летним опытом создания цифровых продуктов, сочетающих эстетику и функциональность. Моя страсть — создавать дизайн, который не только красив, но и рассказывает историю.",
+            "skills.1": "UI/UX Дизайн",
+            "skills.2": "Брендинг",
+            "skills.3": "Моушн-дизайн",
+            "skills.4": "Прототипирование",
+            "skills.5": "Дизайн-системы",
+            "contact.title": "Связаться",
+            "contact.text": "Готовы воплотить идеи в жизнь? Давайте создадим что-то удивительное вместе.",
+            "nav.home": "Главная",
+            "nav.works": "Работы",
+            "nav.about": "Инфо",
+            "nav.contact": "Контакты",
+            "hero.name": "Евгений Жданов"
+        }
+    };
+}
+
+// ─── Custom Inertial Smooth Scroll ──────────────────────────────
+class SmoothScroll {
+    constructor() {
+        this.targetScroll = 0;
+        this.currentScroll = 0;
+        this.isScrolling = false;
+        this.ease = 0.08;
+
+        // Cache the active container
+        this.activeContainer = null;
+
+        // Bind methods
+        this.onWheel = this.onWheel.bind(this);
+        this.update = this.update.bind(this);
+        this.onSectionChange = this.onSectionChange.bind(this);
+
+        this.init();
+    }
+
+    init() {
+        // Initial setup
+        this.updateActiveContainer();
+
+        // Listen for wheel on window (to capture all scrolls)
+        window.addEventListener('wheel', this.onWheel, { passive: false });
+
+        // Listen for navigation changes to switch containers
+        // The nav uses creating/removing 'active' class, so we might need to hook into that or listen to a custom event if exists
+        // Looking at code, initLiquidGlassNav dispatches 'set-theme'. We can use that or a MutationObserver.
+        // Or simply poll/check in the loop? MutationObserver is better.
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('active')) {
+                    this.updateActiveContainer();
+                }
+            });
+        });
+
+        // Observe sections for attribute changes (class)
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+        });
+
+        requestAnimationFrame(this.update);
+    }
+
+    updateActiveContainer() {
+        const newContainer = document.querySelector('.section.active');
+        if (newContainer !== this.activeContainer) {
+            this.activeContainer = newContainer;
+            if (this.activeContainer) {
+                this.targetScroll = this.activeContainer.scrollTop;
+                this.currentScroll = this.activeContainer.scrollTop;
+            }
+        }
+    }
+
+    onSectionChange() {
+        this.updateActiveContainer();
+    }
+
+    getMaxScroll() {
+        if (!this.activeContainer) return 0;
+        return this.activeContainer.scrollHeight - this.activeContainer.clientHeight;
+    }
+
+    onWheel(e) {
+        if (!this.activeContainer) return;
+
+        // Check if content overflows; if not, don't hijack scroll (unless we want to prevent default anyway)
+        const maxScroll = this.getMaxScroll();
+        if (maxScroll <= 0) return;
+
+        e.preventDefault();
+
+        this.targetScroll += e.deltaY;
+        this.targetScroll = Math.max(0, Math.min(this.targetScroll, maxScroll));
+
+        this.isScrolling = true;
+    }
+
+    update() {
+        if (!this.activeContainer) {
+            requestAnimationFrame(this.update);
+            return;
+        }
+
+        // Linear interpolation
+        const diff = this.targetScroll - this.currentScroll;
+        const delta = diff * this.ease;
+
+        this.currentScroll += delta;
+
+        if (Math.abs(diff) < 0.5) {
+            this.currentScroll = this.targetScroll;
+            this.isScrolling = false;
+        } else {
+            this.isScrolling = true;
+        }
+
+        if (this.isScrolling) {
+            this.activeContainer.scrollTop = this.currentScroll;
+        } else {
+            // Sync with native scroll if user dragged scrollbar
+            // (Use a larger threshold to avoid fighting our own scroll updates)
+            if (this.activeContainer && Math.abs(this.activeContainer.scrollTop - this.currentScroll) > 10) {
+                this.targetScroll = this.activeContainer.scrollTop;
+                this.currentScroll = this.activeContainer.scrollTop;
+            }
+        }
+
+        // Expose scroll position for Shader
+        window.liquidScrollY = this.currentScroll;
+
+        requestAnimationFrame(this.update);
+    }
+}
+
+// Initialize SmoothScroll
+if (window.matchMedia("(min-width: 768px)").matches) {
+    // Run immediately since DOMContentLoaded handles initLanguageSwitcher call structure
+    // But to be safe, we can just instantiate it here as script.js is likely deferred or at bottom
+    new SmoothScroll();
 }
 
 /* initInteractiveGradient removed — replaced by shader-bg.js WebGL shader */
@@ -508,4 +638,70 @@ window.addEventListener('resize', debounce(() => {
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.documentElement.style.setProperty('--transition-bounce', '0.3s ease');
     document.documentElement.style.setProperty('--transition-spring', '0.3s ease');
+}
+
+/**
+ * Timeline Scroll Animation
+ * Animates the vertical progress line based on scroll position within the timeline container
+ * Ported from Framer Motion logic to Vanilla JS IntersectionObserver & Scroll
+ */
+function initTimeline() {
+    const timelineContainer = document.querySelector('.timeline-wrapper');
+    const progressLine = document.querySelector('.timeline-line-progress');
+    const section = document.querySelector('#about'); // The scroll container
+
+    if (!timelineContainer || !progressLine || !section) return;
+
+    // We need to calculate progress based on how much of the timeline container
+    // has passed a certain viewport threshold (e.g. top of screen).
+
+    function updateProgress() {
+        const containerRect = timelineContainer.getBoundingClientRect();
+
+        // Calculate the total scrollable height of the timeline
+        const totalHeight = containerRect.height;
+
+        // Calculate progress height: Distance from top of container to center of viewport
+        // This makes the "beam" end exactly at the center of the screen
+        const viewportCenter = window.innerHeight / 2;
+        let currentHeight = viewportCenter - containerRect.top;
+
+        // Clamp values
+        if (currentHeight < 0) currentHeight = 0;
+        if (currentHeight > totalHeight) currentHeight = totalHeight;
+
+        const progressPercent = (currentHeight / totalHeight) * 100;
+
+        // Apply height
+        progressLine.style.height = `${progressPercent}%`;
+
+        // --- Dot Animation Logic ---
+        const dots = document.querySelectorAll('.timeline-dot');
+
+        dots.forEach(dot => {
+            const dotRect = dot.getBoundingClientRect();
+            // Calculate center of the dot relative to viewport
+            const dotCenterY = dotRect.top + (dotRect.height / 2);
+
+            // Activate if the dot's center has crossed the viewport center (with a small buffer)
+            if (dotCenterY < viewportCenter + 10) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    // Since the .section container has overflow-y: auto, we listen to scroll on IT, not window
+    section.addEventListener('scroll', () => {
+        requestAnimationFrame(updateProgress);
+    });
+
+    // Also update on resize
+    window.addEventListener('resize', () => {
+        requestAnimationFrame(updateProgress);
+    });
+
+    // Initial calculation
+    updateProgress();
 }

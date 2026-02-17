@@ -351,6 +351,322 @@ body {
 }
 
 /* ========================================
+   Custom Scrollbar & Smooth Scroll
+======================================== */
+::-webkit-scrollbar {
+    width: 10px;
+    background: var(--color-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 5px;
+    border: 2px solid var(--color-bg-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+html,
+body {
+    scroll-behavior: smooth !important;
+}
+
+/* ========================================
+   Timeline Component (Centered & Refined)
+======================================== */
+.timeline-container {
+    width: 100%;
+    margin-top: var(--spacing-2xl);
+    padding-bottom: var(--spacing-2xl);
+    position: relative;
+    max-width: 90rem;
+    /* Increased max-width for spacing */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.timeline-header {
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg) var(--spacing-xl);
+    max-width: 80rem;
+    text-align: center;
+    /* Center header too */
+}
+
+.timeline-heading {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+}
+
+.timeline-subheading {
+    color: var(--color-text-secondary);
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.timeline-wrapper {
+    position: relative;
+    padding-top: var(--spacing-xl);
+}
+
+/* 
+   Line & Beam Layout 
+   Centered absolutely
+*/
+.timeline-line-container {
+    position: absolute;
+    left: 20px;
+    /* Mobile: Left aligned */
+    top: 0;
+    bottom: 0px;
+    width: 2px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+@media (min-width: 768px) {
+    .timeline-line-container {
+        left: 50%;
+        margin-left: -1px;
+        /* Center perfectly */
+    }
+}
+
+.timeline-line-background {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.1) 10%, rgba(255, 255, 255, 0.1) 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.timeline-line-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    /* Beam Gradient: Purple -> Blue -> Fade */
+    background: linear-gradient(to top, var(--color-accent-purple) 0%, var(--color-accent-blue) 50%, transparent 100%);
+    box-shadow: 0 0 20px 2px var(--color-accent-blue);
+    border-radius: 9999px;
+    transition: height 0.05s linear;
+
+    /* Soften the bottom edge so it dissolves */
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+/* Timeline Item Layout */
+.timeline-item {
+    display: flex;
+    flex-direction: column;
+    /* Mobile default */
+    justify-content: flex-start;
+    padding-top: 40px;
+    position: relative;
+    margin-bottom: var(--spacing-2xl);
+    z-index: 2;
+    /* Above line */
+}
+
+@media (min-width: 768px) {
+    .timeline-item {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+/* 
+   Left Column: Sticky Year + Dot
+*/
+.timeline-left {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    position: sticky;
+    top: 15vh;
+    /* Stick position */
+    align-self: flex-start;
+    z-index: 10;
+    width: 100%;
+    /* Mobile: Full width */
+}
+
+@media (min-width: 768px) {
+    .timeline-left {
+        width: 50%;
+        /* Half width */
+        justify-content: flex-end;
+        /* Align content to center line */
+        padding-right: 60px;
+        /* Space from line */
+        text-align: right;
+        /* Align text to line */
+    }
+}
+
+/* The Dot */
+.timeline-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #000;
+    /* Dark center */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    margin-left: 11px;
+    /* Mobile positioning */
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px #050506;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.timeline-dot.active {
+    background: var(--color-accent-blue);
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 0 20px var(--color-accent-blue), 0 0 40px var(--color-accent-purple);
+    transform: scale(1.2);
+}
+
+@media (min-width: 768px) {
+    .timeline-dot {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        right: -12px;
+        /* Center on the right edge of left column (which aligns with center line) */
+        top: 10px;
+        /* Align with text top approximately */
+        margin-left: 0;
+    }
+}
+
+/* The Year Title */
+.timeline-year-title {
+    display: none;
+    /* Hidden on mobile */
+    font-size: 5rem;
+    /* Large font */
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.1);
+    line-height: 1;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.timeline-dot.active+.timeline-year-title {
+    color: rgba(255, 255, 255, 0.8);
+    /* Light up year too */
+}
+
+/* We need to re-order HTML slightly via Flex order or just structure to make sure Dot and Year interact well or just target parent */
+/* Actually, CSS selector .timeline-dot.active + .timeline-year-title works if they are siblings. */
+
+@media (min-width: 768px) {
+    .timeline-year-title {
+        display: block;
+    }
+}
+
+/* 
+   Right Column: Content
+*/
+.timeline-right {
+    position: relative;
+    padding-left: 50px;
+    /* Space for mobile dot */
+    padding-right: 20px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .timeline-right {
+        width: 50%;
+        padding-left: 60px;
+        /* Space from line */
+        padding-right: 0;
+    }
+}
+
+.timeline-year-mobile {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: var(--spacing-sm);
+    margin-top: -10px;
+}
+
+@media (min-width: 768px) {
+    .timeline-year-mobile {
+        display: none;
+    }
+}
+
+.timeline-text {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Grid Images */
+.timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.timeline-img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    object-fit: cover;
+    aspect-ratio: 16/10;
+
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    box-shadow:
+        0 0 24px rgba(34, 42, 53, 0.1),
+        0 1px 1px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+    transition: transform 0.3s ease;
+}
+
+.timeline-img:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Checklist */
+.timeline-checklist {
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.check-item {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ========================================
    Hero Section
 ======================================== */
 .hero-section {
@@ -381,17 +697,13 @@ body {
     /* Rim border */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.0) 100%);
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    /* Organic Blob Shape */
+    /* Organic Static Shape */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
 
-    /* Interactive Window Styles REMOVED - Replaced with Organic Animation */
-    /* transform-style: preserve-3d;
-    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); */
-
-    /* Animation: Organic Morph */
-    animation: morphOrganic 12s ease-in-out infinite;
-    will-change: border-radius;
+    /* Animation Removed */
+    /* animation: morphOrganic 12s ease-in-out infinite; */
+    /* will-change: border-radius; */
 
     transition: transform 0.2s ease-out;
     box-shadow:
@@ -1117,7 +1429,7 @@ body {
     .hero-avatar-wrapper {
         order: 2;
         /* Move avatar below text */
-        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        border-radius: 65% 35% 40% 60% / 60% 40% 60% 40%;
         transform: none !important;
         /* Disable tilt on mobile for better UX */
         margin-left: 0;
@@ -1399,4 +1711,16 @@ body.nav-hidden .liquid-glass-nav {
     transition: bottom 1.2s cubic-bezier(0.25, 1, 0.5, 1),
         transform 1.2s cubic-bezier(0.25, 1, 0.5, 1),
         opacity 1.2s ease;
+}
+
+/* Fix for About Section overlapped by top nav */
+#about {
+    padding-top: 140px;
+    /* Force more space for top menu */
+}
+
+/* Fix for About Section overlapped by top nav */
+#about {
+    padding-top: 140px;
+    /* Force more space for top menu */
 }
