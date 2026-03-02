@@ -801,12 +801,31 @@ body {
 
 /* ========================================
    Works Section (Categories)
-======================================== */
+/* Works section must NEVER scroll on desktop. Cards compress to fit. */
+.works-section {
+    overflow: hidden !important;
+}
+
+.works-section .section-content {
+    margin-top: 0;
+    margin-bottom: 0px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .works-grid {
     display: grid;
-    /* 3 equal columns on large screens, standard gap */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-lg);
+    flex: 1;
+    /* Take up remaining height */
+    min-height: 0;
+    /* Allow infinite shrinking */
+    max-height: 750px;
+    /* User request: max height 750px on QHD */
+    margin-bottom: 0px;
+    align-items: stretch;
 }
 
 .work-category-card {
@@ -814,7 +833,9 @@ body {
     border-radius: 18px;
     padding: 32px 28px 28px 28px;
     overflow: hidden;
-    aspect-ratio: 5/7;
+    height: 100%;
+    min-height: 0;
+    /* Allow shrinking */
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -1523,6 +1544,13 @@ body {
 /* ========================================
    Responsive Design
 ======================================== */
+
+@media (max-width: 1920px) {
+    .works-grid {
+        max-height: 550px;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-main-layout {
         flex-direction: column;
@@ -1601,8 +1629,46 @@ body {
         padding: var(--spacing-md) var(--spacing-sm);
     }
 
+    .works-section {
+        overflow-x: hidden;
+        overflow-y: visible !important;
+    }
+
+    .works-section .section-content {
+        margin: 0;
+        display: block;
+    }
+
     .works-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        overflow-x: auto;
+        overflow-y: visible;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: var(--spacing-md);
+        /* Offset the grid further up to clear glow, and pad bottom heavily to clear nav */
+        padding: 80px 20px 200px 20px;
+        margin: -80px -20px 0 -20px;
+        aspect-ratio: auto;
+        height: auto;
+        max-height: none;
+        /* Hide scrollbar for cleaner look */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .works-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .work-category-card {
+        flex: 0 0 80vw;
+        max-width: 80vw;
+        scroll-snap-align: center;
+        /* Tall cards on mobile - using vh but with a sensible min/max */
+        height: 80vh;
+        min-height: 400px;
+        max-height: 650px;
     }
 
     /* Hide language button on mobile - doesn't fit */
