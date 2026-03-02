@@ -69,5 +69,13 @@ jobs:
             cp -r /var/www/html/* /var/www/zhdanov.design/
             chown -R www-data:www-data /var/www/zhdanov.design
             
-            # 7. Reload
+            # 7. Copy to Mail-in-a-Box managed web roots (MIAB serves from these)
+            mkdir -p /home/user-data/www/default
+            mkdir -p /home/user-data/www/zhdanov.design
+            cp -r /var/www/html/* /home/user-data/www/default/
+            cp -r /var/www/html/* /home/user-data/www/zhdanov.design/
+            chown -R www-data:www-data /home/user-data/www/default
+            chown -R www-data:www-data /home/user-data/www/zhdanov.design
+            
+            # 8. Reload
             systemctl reload nginx
