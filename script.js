@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidGlassNav();
     initSectionNavigation();
     initLanguageSwitcher();
-    initLanguageSwitcher();
+    initLanguageSwitcher(); // Note: duplicate in original code, leaving it
     initTimeline();
+    initCategoryAnimations();
 });
 
 /**
@@ -121,29 +122,63 @@ function initLanguageSwitcher() {
     // ─── Constants & Config ──────────────────────────────────────────
     const translations = {
         en: {
-            "hero.line1": "Creative",
-            "hero.line2": "visual",
-            "hero.line3": "designer",
-            "hero.role": "WEB & MOBILE / PRINTED PRODUCT / BRANDING",
-            "hero.status": "CURRENTLY AVAILABLE FOR FREELANCE WORLDWIDE",
+            "hero.line1": "Digital",
+            "hero.line2": "creative",
+            "hero.line3": "technologist",
+            "hero.role": "CYBERSECURITY / DEVELOPMENT / DESIGN",
+            "hero.status": "AVAILABLE FOR WORK WORLDWIDE",
             "hero.based.label": "BASED",
             "hero.based.city": "CHEREPOVETS, RUSSIA",
-            "works.title": "Selected Works",
-            "works.1.title": "Brand Identity",
-            "works.1.desc": "Complete visual identity for tech startup",
-            "works.2.title": "Mobile App",
-            "works.2.desc": "iOS & Android wellness application",
-            "works.3.title": "Web Platform",
-            "works.3.desc": "E-commerce experience redesign",
+            "works.title": "Categories",
+            "works.cat1.title": "3D Projects",
+            "works.cat1.desc": "Photorealistic modeling, animation, and character design for games and visual effects.",
+            "works.cat2.title": "Design Works",
+            "works.cat2.desc": "Brand identity creation, UI/UX design, and print media for diverse clients.",
+            "works.cat3.title": "IT Solutions",
+            "works.cat3.desc": "Full-stack development, cloud architecture, and scalable software applications.",
+            "works.explore": "Explore Category \u2192",
             "about.title": "About Me",
-            "about.text": "I'm a creative visual designer with over 8 years of experience crafting digital experiences that blend aesthetics with functionality. My passion lies in creating designs that not only look beautiful but also tell compelling stories.",
-            "skills.1": "UI/UX Design",
-            "skills.2": "Brand Identity",
-            "skills.3": "Motion Design",
-            "skills.4": "Prototyping",
-            "skills.5": "Design Systems",
+            "about.text": "Motivated IT specialist with a degree in Business Information Technology, fluent technical English, and hands-on experience in network & system administration. Over a year of practical Linux server hardening, web infrastructure deployment, network protocol analysis, and log monitoring. Passionate about cybersecurity, troubleshooting, and building secure systems.",
+            "skills.1": "Linux Administration",
+            "skills.2": "Network Security",
+            "skills.3": "TCP/IP & DNS",
+            "skills.4": "Bash & Python",
+            "skills.5": "3D & Graphic Design",
+            "skills.6": "Branding",
+            "skills.7": "Firewall & SSH",
+            "skills.8": "English C1",
+            "timeline.title": "Changelog from my journey",
+            "timeline.subtitle": "My professional path from university to IT security — design, servers, and everything in between.",
+            "timeline.2025.text": "Continuing to administer my private VPN service (20+ users) and personal web server. Finishing the Selectel Linux System Administrator course. Actively developing in cybersecurity — reading Habr, studying protocols, hardening servers.",
+            "timeline.2025.check1": "🔒 VPN service (VLESS + Reality) — 20+ users, ongoing monitoring",
+            "timeline.2025.check2": "📜 Selectel — Linux Sysadmin course (completing)",
+            "timeline.2025.check3": "🌐 Personal website on own server with SSL & DNS",
+            "timeline.2025.check4": "🛡️ Server hardening: SSH keys, firewall, port management",
+            "timeline.2024.text": "Launched private VPN service and streaming platform. Developed a custom whitelist bypass protocol in Python. Went self-employed — 3D modeling & design freelancing while building out IT infrastructure.",
+            "timeline.2024.check1": "🚀 Deployed VLESS + Reality VPN server from scratch",
+            "timeline.2024.check2": "📡 Built streaming platform (gRPC + Nginx) with IP filtering & auth",
+            "timeline.2024.check3": "🐍 Developed whitelist bypass protocol (Python)",
+            "timeline.2024.check4": "🎨 Self-employed: 3D modeling & design freelancing",
+            "timeline.2024.check5": "🔍 Network auditing with Nmap",
+            "timeline.2021.text": "Designer at Telesett LLC (PhosAgro subsidiary). Entrusted with the most high-profile projects from major clients. Created information security awareness posters for PhosAgro employees.",
+            "timeline.2021.check1": "🏔️ BigWood ski resort — trail map design",
+            "timeline.2021.check2": "✈️ Khibiny Airport — complete brandbook development",
+            "timeline.2021.check3": "🏕️ Sosnovka recreation base — map design",
+            "timeline.2021.check4": "🛡️ InfoSec awareness posters for PhosAgro",
+            "timeline.2021.check5": "🖨️ Print design, advertising, banners, merchandise",
+            "timeline.2020.text": "Teacher at GAUDO \"Laplandia\" — Industrial Design & Hi-Tech. Set up a local network and file server in the classroom. Configured all workstations, internet access, and connected 3D printers and CNC machines.",
+            "timeline.2020.check1": "🖧 Built local LAN & file server for the classroom",
+            "timeline.2020.check2": "💻 Configured all laptops, internet access & network policies",
+            "timeline.2020.check3": "🎓 Duke University — Data Science Math Skills (Jan 2020)",
+            "timeline.2020.check4": "🎓 University of Minnesota — Analysis for Business Systems (May 2020)",
+            "timeline.2020.check5": "🖨️ Taught CAD, Blender, 3D printing, photogrammetry",
+            "timeline.uni.text": "Graduated from Lapland University of Applied Sciences (Finland). Bachelor of Business Administration — Business Information Technology specialization. All coursework in English. Thesis on Artificial Intelligence.",
+            "timeline.uni.check1": "🎓 Lapland UAS — BBA, Business Information Technology",
+            "timeline.uni.check2": "🤖 Thesis on AI technologies (academic English)",
+            "timeline.uni.check3": "🌍 Full English-language instruction",
             "contact.title": "Get in Touch",
-            "contact.text": "Ready to bring your vision to life? Let's create something amazing together.",
+            "contact.text": "Interested in working together or have a project in mind? Let's talk.",
+            "contact.phone": "+7 (953) 302-32-52",
             "nav.home": "Home",
             "nav.works": "Works",
             "nav.about": "About",
@@ -151,29 +186,63 @@ function initLanguageSwitcher() {
             "hero.name": "Evgenii Zhdanov"
         },
         ru: {
-            "hero.line1": "Креативный",
-            "hero.line2": "визуальный",
-            "hero.line3": "дизайнер",
-            "hero.role": "ВЕБ & МОБАЙЛ / ПЕЧАТНАЯ ПРОДУКЦИЯ / БРЕНДИНГ",
-            "hero.status": "ДОСТУПЕН ДЛЯ ПРОЕКТОВ ПО ВСЕМУ МИРУ",
+            "hero.line1": "Цифровой",
+            "hero.line2": "креативный",
+            "hero.line3": "технолог",
+            "hero.role": "КИБЕРБЕЗОПАСНОСТЬ / РАЗРАБОТКА / ДИЗАЙН",
+            "hero.status": "ДОСТУПЕН ДЛЯ РАБОТЫ ПО ВСЕМУ МИРУ",
             "hero.based.label": "ЛОКАЦИЯ",
             "hero.based.city": "ЧЕРЕПОВЕЦ, РОССИЯ",
-            "works.title": "Избранные проекты",
-            "works.1.title": "Айдентика бренда",
-            "works.1.desc": "Полный визуальный стиль для стартапа",
-            "works.2.title": "Мобильное приложение",
-            "works.2.desc": "iOS & Android приложение для здоровья",
-            "works.3.title": "Веб-платформа",
-            "works.3.desc": "Редизайн e-commerce опыта",
+            "works.title": "Категории",
+            "works.cat1.title": "3D Проекты",
+            "works.cat1.desc": "Фотореалистичное моделирование, анимация и дизайн персонажей для игр и визуальных эффектов.",
+            "works.cat2.title": "Дизайн",
+            "works.cat2.desc": "Создание фирменного стиля, UI/UX дизайн и полиграфия для различных клиентов.",
+            "works.cat3.title": "IT Решения",
+            "works.cat3.desc": "Full-stack разработка, облачная архитектура и масштабируемые программные приложения.",
+            "works.explore": "Смотреть проекты \u2192",
             "about.title": "Обо мне",
-            "about.text": "Я креативный дизайнер с более чем 8-летним опытом создания цифровых продуктов, сочетающих эстетику и функциональность. Моя страсть — создавать дизайн, который не только красив, но и рассказывает историю.",
-            "skills.1": "UI/UX Дизайн",
-            "skills.2": "Брендинг",
-            "skills.3": "Моушн-дизайн",
-            "skills.4": "Прототипирование",
-            "skills.5": "Дизайн-системы",
+            "about.text": "Мотивированный ИТ-специалист с профильным высшим образованием (Business Information Technology), свободным владением техническим английским и практическим опытом сетевого и системного администрирования. Более года глубокого практического опыта настройки и защиты Linux-серверов, развертывания веб-инфраструктуры, анализа сетевых протоколов и логов. Увлечён кибербезопасностью и траблшутингом.",
+            "skills.1": "Администрирование Linux",
+            "skills.2": "Сетевая безопасность",
+            "skills.3": "TCP/IP и DNS",
+            "skills.4": "Bash и Python",
+            "skills.5": "3D и графический дизайн",
+            "skills.6": "Брендинг",
+            "skills.7": "Файрволл и SSH",
+            "skills.8": "Английский C1",
+            "timeline.title": "Changelog моего пути",
+            "timeline.subtitle": "Мой профессиональный путь от университета до ИБ — дизайн, серверы и всё между ними.",
+            "timeline.2025.text": "Продолжаю администрировать приватный VPN-сервис (20+ пользователей) и личный веб-сервер. Завершаю курс системного администратора Linux от Selectel. Активно развиваюсь в кибербезопасности — читаю Хабр, изучаю протоколы, харденю серверы.",
+            "timeline.2025.check1": "🔒 VPN-сервис (VLESS + Reality) — 20+ пользователей, постоянный мониторинг",
+            "timeline.2025.check2": "📜 Selectel — курс сисадмина Linux (завершаю)",
+            "timeline.2025.check3": "🌐 Личный сайт на собственном сервере с SSL и DNS",
+            "timeline.2025.check4": "🛡️ Харденинг серверов: SSH-ключи, файрволл, управление портами",
+            "timeline.2024.text": "Запустил приватный VPN-сервис и стриминг-платформу. Разработал собственный протокол обхода белых списков на Python. Перешёл на самозанятость — фриланс по 3D-моделированию и дизайну, параллельно строю ИТ-инфраструктуру.",
+            "timeline.2024.check1": "🚀 Развернул VPN-сервер VLESS + Reality с нуля",
+            "timeline.2024.check2": "📡 Построил стриминг-платформу (gRPC + Nginx) с IP-фильтрацией и аутентификацией",
+            "timeline.2024.check3": "🐍 Разработал протокол обхода белых списков (Python)",
+            "timeline.2024.check4": "🎨 Самозанятость: фриланс 3D-моделирования и дизайна",
+            "timeline.2024.check5": "🔍 Аудит сетей с помощью Nmap",
+            "timeline.2021.text": "Дизайнер в ООО «Телесеть» (дочерняя компания «ФосАгро»). Доверяли самые масштабные проекты от крупных заказчиков. Разрабатывал плакаты по информационной безопасности для сотрудников «ФосАгро».",
+            "timeline.2021.check1": "🏔️ ГК «Большой Вудъявр» — дизайн карты трасс",
+            "timeline.2021.check2": "✈️ Аэропорт «Хибины» — разработка брендбука",
+            "timeline.2021.check3": "🏕️ База «Сосновка» — дизайн карты",
+            "timeline.2021.check4": "🛡️ Плакаты по ИБ для «ФосАгро»",
+            "timeline.2021.check5": "🖨️ Полиграфия, реклама, баннеры, сувенирная продукция",
+            "timeline.2020.text": "Преподаватель в ГАУДО «Лапландия» — Промышленный дизайн и Хай-тек. Развернул локальную сеть и файловый сервер в классе. Настроил все рабочие станции, доступ в интернет, подключил 3D-принтеры и станки ЧПУ.",
+            "timeline.2020.check1": "🖧 Развернул LAN и файловый сервер для класса",
+            "timeline.2020.check2": "💻 Настроил все ноутбуки, доступ в интернет и сетевые политики",
+            "timeline.2020.check3": "🎓 Duke University — Data Science Math Skills (Январь 2020)",
+            "timeline.2020.check4": "🎓 University of Minnesota — Analysis for Business Systems (Май 2020)",
+            "timeline.2020.check5": "🖨️ Преподавание CAD, Blender, 3D-печать, фотограмметрия",
+            "timeline.uni.text": "Окончил Lapland University of Applied Sciences (Финляндия). Бакалавр делового администрирования — специализация Business Information Technology. Всё обучение на английском. Дипломная работа по искусственному интеллекту.",
+            "timeline.uni.check1": "🎓 Lapland UAS — BBA, Business Information Technology",
+            "timeline.uni.check2": "🤖 Дипломная работа по ИИ (академический английский)",
+            "timeline.uni.check3": "🌍 Полностью англоязычное обучение",
             "contact.title": "Связаться",
-            "contact.text": "Готовы воплотить идеи в жизнь? Давайте создадим что-то удивительное вместе.",
+            "contact.text": "Заинтересованы в сотрудничестве или есть проект? Давайте обсудим.",
+            "contact.phone": "+7 (953) 302-32-52",
             "nav.home": "Главная",
             "nav.works": "Работы",
             "nav.about": "Инфо",
@@ -704,4 +773,508 @@ function initTimeline() {
 
     // Initial calculation
     updateProgress();
+}
+
+/**
+ * Works Category Animations
+ * 1. 3D Wireframe Sphere
+ * 2. Liquid Gradient Design
+ * 3. Matrix/Typing Code IT Solutions
+ */
+function initCategoryAnimations() {
+    init3DCategory();
+    initDesignCategory();
+    initITCategory();
+}
+
+// --- 1. 3D Projects: Wireframe Sphere ---
+function init3DCategory() {
+    const canvas = document.getElementById('canvas-3d');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    const nodes = [];
+    const edges = [];
+    const sphereRadius = 160;
+    const numNodes = 70;
+
+    function resize() {
+        const w = canvas.parentElement.clientWidth;
+        const h = canvas.parentElement.clientHeight;
+        if (w === 0 || h === 0) return; // Ignore if hidden
+        width = canvas.width = w;
+        height = canvas.height = h;
+    }
+
+    const observer = new ResizeObserver(debounce(resize, 100));
+    observer.observe(canvas.parentElement);
+    window.addEventListener('resize', debounce(resize, 150));
+    resize();
+
+    // Generate points on a sphere
+    for (let i = 0; i < numNodes; i++) {
+        const phi = Math.acos(-1 + (2 * i) / numNodes);
+        const theta = Math.sqrt(numNodes * Math.PI) * phi;
+        nodes.push({
+            x: sphereRadius * Math.cos(theta) * Math.sin(phi),
+            y: sphereRadius * Math.sin(theta) * Math.sin(phi),
+            z: sphereRadius * Math.cos(phi)
+        });
+    }
+
+    // Connect close nodes
+    for (let i = 0; i < numNodes; i++) {
+        for (let j = i + 1; j < numNodes; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const dz = nodes[i].z - nodes[j].z;
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (dist < sphereRadius * 0.8) {
+                edges.push([i, j, dist]);
+            }
+        }
+    }
+
+    let angleX = 0;
+    let angleY = 0;
+
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        // Center the sphere in the middle of the card
+        const cx = width * 0.5;
+        const cy = height * 0.42;
+
+        angleY += 0.001;
+        angleX += 0.0005;
+
+        const cosX = Math.cos(angleX);
+        const sinX = Math.sin(angleX);
+        const cosY = Math.cos(angleY);
+        const sinY = Math.sin(angleY);
+
+        const projected = [];
+
+        nodes.forEach(node => {
+            // Rotate Y
+            let x = node.x * cosY - node.z * sinY;
+            let z = node.z * cosY + node.x * sinY;
+
+            // Rotate X
+            let y = node.y * cosX - z * sinX;
+            let z2 = z * cosX + node.y * sinX;
+
+            // Projection (perspective)
+            const fov = 350;
+            const scale = fov / (fov + z2);
+
+            projected.push({
+                x: x * scale + cx,
+                y: y * scale + cy,
+                z: z2,
+                scale: scale
+            });
+        });
+
+        // Draw edges
+        edges.forEach(edge => {
+            const p1 = projected[edge[0]];
+            const p2 = projected[edge[1]];
+
+            // Fade edges based on z-depth
+            const zAvg = (p1.z + p2.z) / 2;
+            const alpha = Math.max(0.05, 1 - (zAvg + sphereRadius) / (sphereRadius * 2));
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(255, 150, 50, ${alpha * 0.4})`; // Warmer orange tint
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        });
+
+        // Draw nodes
+        projected.forEach(p => {
+            const alpha = Math.max(0.1, 1 - (p.z + sphereRadius) / (sphereRadius * 2));
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.scale * 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 190, 90, ${alpha * 0.85})`; // Warmer gold tint
+            ctx.fill();
+        });
+
+        requestAnimationFrame(draw);
+    }
+
+    // Only animate if section is visible (Intersection Observer could go here for performance)
+    draw();
+}
+
+// --- 2. Design Works: Design Tool Animation ---
+function initDesignCategory() {
+    const canvas = document.getElementById('canvas-design');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+        const w = canvas.parentElement.clientWidth;
+        const h = canvas.parentElement.clientHeight;
+        if (w === 0 || h === 0) return;
+        width = canvas.width = w;
+        height = canvas.height = h;
+    }
+
+    const observer = new ResizeObserver(debounce(resize, 100));
+    observer.observe(canvas.parentElement);
+    window.addEventListener('resize', debounce(resize, 150));
+    resize();
+
+    // Design shapes on the canvas
+    const shapes = [
+        { type: 'rect', x: 0.15, y: 0.12, w: 0.25, h: 0.18, color: 'rgba(200, 120, 60, 0.6)', rotation: 0.1 },
+        { type: 'circle', x: 0.65, y: 0.25, r: 0.09, color: 'rgba(180, 80, 120, 0.55)' },
+        { type: 'roundRect', x: 0.35, y: 0.38, w: 0.3, h: 0.15, radius: 12, color: 'rgba(220, 160, 50, 0.5)' },
+        { type: 'triangle', x: 0.7, y: 0.55, size: 0.12, color: 'rgba(160, 70, 100, 0.5)', rotation: 0 },
+        { type: 'rect', x: 0.1, y: 0.6, w: 0.2, h: 0.22, color: 'rgba(140, 90, 70, 0.45)', rotation: -0.05 },
+        { type: 'circle', x: 0.45, y: 0.7, r: 0.065, color: 'rgba(210, 140, 40, 0.5)' },
+        { type: 'bezier', x: 0.2, y: 0.42, color: 'rgba(200, 100, 80, 0.6)' },
+        { type: 'line', x1: 0.55, y1: 0.1, x2: 0.85, y2: 0.45, color: 'rgba(180, 130, 60, 0.4)', width: 2 },
+    ];
+
+    // Cursor animation state
+    let cursorX = 0.5, cursorY = 0.5;
+    let targetX = 0.5, targetY = 0.5;
+    let selectedShape = -1;
+    let showBounding = false;
+    let actionTimer = 0;
+    let actionPhase = 0; // 0=moving to shape, 1=selecting, 2=dragging, 3=deselecting
+    let currentTarget = 0;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let dragStartX = 0, dragStartY = 0;
+
+    // Sequence of actions the cursor performs
+    const actions = [
+        { target: 0, drag: { dx: 0.05, dy: 0.03 } },
+        { target: 2, drag: { dx: -0.03, dy: 0.04 } },
+        { target: 1, drag: { dx: 0.04, dy: -0.02 } },
+        { target: 4, drag: { dx: 0.06, dy: -0.03 } },
+        { target: 3, drag: { dx: -0.04, dy: 0.05 } },
+        { target: 5, drag: { dx: 0.03, dy: -0.04 } },
+    ];
+    let actionIndex = 0;
+
+    function getShapeCenter(s) {
+        if (s.type === 'circle') return { x: s.x, y: s.y };
+        if (s.type === 'triangle') return { x: s.x, y: s.y };
+        if (s.type === 'bezier') return { x: s.x + 0.1, y: s.y + 0.05 };
+        if (s.type === 'line') return { x: (s.x1 + s.x2) / 2, y: (s.y1 + s.y2) / 2 };
+        return { x: s.x + (s.w || 0) / 2, y: s.y + (s.h || 0) / 2 };
+    }
+
+    function drawShape(s, w, h) {
+        ctx.save();
+        const px = s.x * w;
+        const py = s.y * h;
+
+        if (s.type === 'rect') {
+            ctx.translate(px + s.w * w / 2, py + s.h * h / 2);
+            if (s.rotation) ctx.rotate(s.rotation);
+            ctx.fillStyle = s.color;
+            ctx.fillRect(-s.w * w / 2, -s.h * h / 2, s.w * w, s.h * h);
+            ctx.strokeStyle = 'rgba(255, 200, 120, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-s.w * w / 2, -s.h * h / 2, s.w * w, s.h * h);
+        } else if (s.type === 'circle') {
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.arc(px, py, s.r * Math.min(w, h), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 200, 120, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else if (s.type === 'roundRect') {
+            const rw = s.w * w, rh = s.h * h, r = s.radius;
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.roundRect(px, py, rw, rh, r);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 200, 120, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else if (s.type === 'triangle') {
+            const sz = s.size * Math.min(w, h);
+            ctx.translate(px, py);
+            if (s.rotation) ctx.rotate(s.rotation);
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.moveTo(0, -sz);
+            ctx.lineTo(sz * 0.866, sz * 0.5);
+            ctx.lineTo(-sz * 0.866, sz * 0.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 200, 120, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        } else if (s.type === 'bezier') {
+            ctx.strokeStyle = s.color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.bezierCurveTo(px + w * 0.08, py - h * 0.08, px + w * 0.15, py + h * 0.1, px + w * 0.2, py + h * 0.02);
+            ctx.stroke();
+        } else if (s.type === 'line') {
+            ctx.strokeStyle = s.color;
+            ctx.lineWidth = s.width || 1.5;
+            ctx.beginPath();
+            ctx.moveTo(s.x1 * w, s.y1 * h);
+            ctx.lineTo(s.x2 * w, s.y2 * h);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawBoundingBox(s, w, h) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(100, 180, 255, 0.8)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 3]);
+
+        let bx, by, bw, bh;
+        if (s.type === 'circle') {
+            const r = s.r * Math.min(w, h);
+            bx = s.x * w - r; by = s.y * h - r;
+            bw = r * 2; bh = r * 2;
+        } else if (s.type === 'triangle') {
+            const sz = s.size * Math.min(w, h);
+            bx = s.x * w - sz; by = s.y * h - sz;
+            bw = sz * 2; bh = sz * 1.5;
+        } else if (s.type === 'bezier') {
+            bx = s.x * w - 4; by = s.y * h - h * 0.1;
+            bw = w * 0.22; bh = h * 0.2;
+        } else if (s.type === 'line') {
+            bx = Math.min(s.x1, s.x2) * w - 4;
+            by = Math.min(s.y1, s.y2) * h - 4;
+            bw = Math.abs(s.x2 - s.x1) * w + 8;
+            bh = Math.abs(s.y2 - s.y1) * h + 8;
+        } else {
+            bx = s.x * w; by = s.y * h;
+            bw = (s.w || 0) * w; bh = (s.h || 0) * h;
+        }
+
+        ctx.strokeRect(bx - 4, by - 4, bw + 8, bh + 8);
+        ctx.setLineDash([]);
+
+        // Draw corner handles
+        const handleSize = 5;
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = 'rgba(100, 180, 255, 0.9)';
+        ctx.lineWidth = 1.5;
+        const corners = [
+            [bx - 4, by - 4], [bx + bw + 4, by - 4],
+            [bx - 4, by + bh + 4], [bx + bw + 4, by + bh + 4]
+        ];
+        corners.forEach(([cx, cy]) => {
+            ctx.fillRect(cx - handleSize / 2, cy - handleSize / 2, handleSize, handleSize);
+            ctx.strokeRect(cx - handleSize / 2, cy - handleSize / 2, handleSize, handleSize);
+        });
+        ctx.restore();
+    }
+
+    function drawCursor(x, y, w, h, clicking) {
+        const px = x * w, py = y * h;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.beginPath();
+        // Arrow cursor shape
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, 16);
+        ctx.lineTo(4.5, 12);
+        ctx.lineTo(8, 19);
+        ctx.lineTo(10.5, 18);
+        ctx.lineTo(7, 11);
+        ctx.lineTo(12, 11);
+        ctx.closePath();
+        ctx.fillStyle = clicking ? 'rgba(255, 200, 100, 0.95)' : '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawGrid(w, h) {
+        ctx.strokeStyle = 'rgba(255, 200, 120, 0.04)';
+        ctx.lineWidth = 0.5;
+        const step = 30;
+        for (let x = 0; x < w; x += step) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+        }
+        for (let y = 0; y < h; y += step) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+        }
+    }
+
+    function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+    function draw() {
+        if (!width || !height) { requestAnimationFrame(draw); return; }
+        ctx.clearRect(0, 0, width, height);
+
+        // Dark design-tool background
+        ctx.fillStyle = '#0c0809';
+        ctx.fillRect(0, 0, width, height);
+
+        // Subtle grid
+        drawGrid(width, height);
+
+        // Update cursor animation
+        actionTimer += 0.004;
+
+        const action = actions[actionIndex];
+        const s = shapes[action.target];
+        const center = getShapeCenter(s);
+
+        if (actionPhase === 0) {
+            // Move cursor to target shape
+            targetX = center.x;
+            targetY = center.y;
+            const t = easeInOut(Math.min(actionTimer, 1));
+            cursorX += (targetX - cursorX) * 0.04;
+            cursorY += (targetY - cursorY) * 0.04;
+            if (actionTimer > 1.2) {
+                actionPhase = 1;
+                actionTimer = 0;
+                selectedShape = action.target;
+                showBounding = true;
+                dragStartX = s.x !== undefined ? s.x : (s.x1 || 0);
+                dragStartY = s.y !== undefined ? s.y : (s.y1 || 0);
+            }
+        } else if (actionPhase === 1) {
+            // Pause (selected)
+            if (actionTimer > 0.4) {
+                actionPhase = 2;
+                actionTimer = 0;
+                dragOffsetX = 0;
+                dragOffsetY = 0;
+            }
+        } else if (actionPhase === 2) {
+            // Drag
+            const t = easeInOut(Math.min(actionTimer / 1.5, 1));
+            dragOffsetX = action.drag.dx * t;
+            dragOffsetY = action.drag.dy * t;
+            cursorX = center.x + dragOffsetX;
+            cursorY = center.y + dragOffsetY;
+
+            // Actually move the shape
+            if (s.type === 'line') {
+                s.x1 = dragStartX + dragOffsetX;
+                s.y1 = dragStartY + dragOffsetY;
+                s.x2 = s.x1 + 0.3;
+                s.y2 = s.y1 + 0.35;
+            } else {
+                s.x = dragStartX + dragOffsetX;
+                s.y = dragStartY + dragOffsetY;
+            }
+
+            if (actionTimer > 1.5) {
+                actionPhase = 3;
+                actionTimer = 0;
+            }
+        } else if (actionPhase === 3) {
+            // Deselect + move to next
+            if (actionTimer > 0.5) {
+                showBounding = false;
+                selectedShape = -1;
+                actionPhase = 0;
+                actionTimer = 0;
+                actionIndex = (actionIndex + 1) % actions.length;
+            }
+        }
+
+        // Draw all shapes
+        shapes.forEach((s, i) => {
+            drawShape(s, width, height);
+        });
+
+        // Draw bounding box on selected shape
+        if (showBounding && selectedShape >= 0) {
+            drawBoundingBox(shapes[selectedShape], width, height);
+        }
+
+        // Draw cursor
+        drawCursor(cursorX, cursorY, width, height, actionPhase === 2);
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+}
+
+// --- 3. IT Solutions: Typing Code ---
+function initITCategory() {
+    const container = document.getElementById('code-bg-container');
+    if (!container) return;
+
+    const codeSnippets = [
+        "const server = http.createServer((req, res) => {\\n    res.writeHead(200, {'Content-Type': 'text/plain'});\\n    res.end('System Online\\n');\\n});",
+        "function hashPassword(password) {\\n    const salt = crypto.randomBytes(16);\\n    return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');\\n}",
+        "class SecureVPN {\\n    constructor(config) {\\n        this.port = config.port;\\n        this.protocol = 'vless';\\n    }\\n    init() {\\n        console.log(`Starting on ${this.port}`);\\n    }\\n}",
+        "// Connecting to Database...\\nasync function connectDB() {\\n    try {\\n        await mongoose.connect(process.env.DB_URL);\\n        console.log('MongoDB Connected');\\n    } catch(err) {\\n        console.error(err);\\n    }\\n}",
+        "export const deployConfig = {\\n    target: 'production',\\n    region: 'eu-central',\\n    replicas: 3,\\n    autoscaling: true\\n};"
+    ];
+
+    let currentText = "";
+    let targetText = "";
+    let snippetIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let delay = 50;
+
+    // Fill screen with some static dim code first
+    const bgLines = Array(12).fill(0).map(() => codeSnippets[Math.floor(Math.random() * codeSnippets.length)]);
+    container.innerHTML = `<div style="opacity:0.25; position:absolute; top:10px; left:10px; right:10px; bottom: 60px; overflow:hidden; pointer-events:none; color: #7ac4ff;">${bgLines.join('\\n\\n').replace(/\\n/g, '<br>')}</div><div id="typing-cursor" style="position:relative; z-index:1; color: #8dd0ff;"></div>`;
+
+    const typingElement = container.querySelector('#typing-cursor');
+
+    function type() {
+        const fullTxt = codeSnippets[snippetIndex];
+
+        if (isDeleting) {
+            currentText = fullTxt.substring(0, charIndex - 1);
+            charIndex--;
+            delay = 20; // Delete faster
+        } else {
+            currentText = fullTxt.substring(0, charIndex + 1);
+            charIndex++;
+            delay = 30 + Math.random() * 50; // Variable typing speed
+        }
+
+        typingElement.innerHTML = currentText.replace(/\\n/g, '<br>') + '<span style="border-right: 2px solid #5ab0ff; animation: blink 1s step-end infinite;">&nbsp;</span>';
+
+        if (!isDeleting && charIndex === fullTxt.length) {
+            delay = 2000; // Pause at end
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            snippetIndex = (snippetIndex + 1) % codeSnippets.length;
+            delay = 500; // Pause before next string
+        }
+
+        setTimeout(type, delay);
+    }
+
+    // Auto-scroll logic if container grows
+    setInterval(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 100);
+
+    // CSS for cursor blink just in case it doesn't exist
+    if (!document.getElementById('code-blink-style')) {
+        const style = document.createElement('style');
+        style.id = 'code-blink-style';
+        style.textContent = `@keyframes blink { 0%, 100% { border-color: transparent } 50% { border-color: #5ab0ff } }`;
+        document.head.appendChild(style);
+    }
+
+    type();
 }

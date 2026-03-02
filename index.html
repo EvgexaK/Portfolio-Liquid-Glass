@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creative Visual Designer Portfolio - Web & Mobile, UX/UI, Branding">
-    <title>Creative Visual Designer | Portfolio</title>
+    <meta name="description" content="Evgenii Zhdanov — IT Specialist, Designer & System Administrator Portfolio">
+    <title>Evgenii Zhdanov | IT & Design</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=1.5">
     <link rel="stylesheet" href="high-res.css">
@@ -35,16 +35,14 @@
             <div class="hero-main-layout">
                 <div class="hero-content">
                     <h1 class="hero-title">
-                        <span class="title-line" data-i18n="hero.line1">Creative</span>
-                        <span class="title-line title-accent" data-i18n="hero.line2">visual</span>
-                        <span class="title-line" data-i18n="hero.line3">designer</span>
+                        <span class="title-line" data-i18n="hero.line1">Digital</span>
+                        <span class="title-line title-accent" data-i18n="hero.line2">creative</span>
+                        <span class="title-line" data-i18n="hero.line3">technologist</span>
                     </h1>
                     <div class="hero-info">
                         <div class="info-group">
-                            <span class="info-label" data-i18n="hero.role">WEB & MOBILE / PRINTED PRODUCT /
-                                BRANDING</span>
-                            <span class="info-value" data-i18n="hero.status">CURRENTLY AVAILABLE FOR FREELANCE
-                                WORLDWIDE</span>
+                            <span class="info-label" data-i18n="hero.role">CYBERSECURITY / DEVELOPMENT / DESIGN</span>
+                            <span class="info-value" data-i18n="hero.status">AVAILABLE FOR WORK WORLDWIDE</span>
                         </div>
                         <div class="info-group">
                             <span class="info-label" data-i18n="hero.based.label">BASED</span>
@@ -62,27 +60,45 @@
         <!-- Works Section -->
         <section id="works" class="section works-section">
             <div class="section-content">
-                <h2 class="section-title" data-i18n="works.title">Selected Works</h2>
+                <h2 class="section-title" data-i18n="works.title">Categories</h2>
                 <div class="works-grid">
-                    <div class="work-card">
-                        <div class="work-card-inner">
-                            <span class="work-number">01</span>
-                            <h3 class="work-title" data-i18n="works.1.title">Brand Identity</h3>
-                            <p class="work-desc" data-i18n="works.1.desc">Complete visual identity for tech startup</p>
+                    <div class="work-category-card">
+                        <canvas id="canvas-3d" class="category-bg-canvas"></canvas>
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-number">01</span>
+                            <h3 class="category-title" data-i18n="works.cat1.title">3D<br>Projects</h3>
+                            <p class="category-desc" data-i18n="works.cat1.desc">Photorealistic modeling, animation, and
+                                character design for games and visual effects.</p>
+                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></a>
                         </div>
                     </div>
-                    <div class="work-card">
-                        <div class="work-card-inner">
-                            <span class="work-number">02</span>
-                            <h3 class="work-title" data-i18n="works.2.title">Mobile App</h3>
-                            <p class="work-desc" data-i18n="works.2.desc">iOS & Android wellness application</p>
+
+                    <div class="work-category-card">
+                        <canvas id="canvas-design" class="category-bg-canvas"></canvas>
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-number">02</span>
+                            <h3 class="category-title" data-i18n="works.cat2.title">Design<br>Works</h3>
+                            <p class="category-desc" data-i18n="works.cat2.desc">Brand identity creation, UI/UX design,
+                                and print media for diverse clients.</p>
+                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></a>
                         </div>
                     </div>
-                    <div class="work-card">
-                        <div class="work-card-inner">
-                            <span class="work-number">03</span>
-                            <h3 class="work-title" data-i18n="works.3.title">Web Platform</h3>
-                            <p class="work-desc" data-i18n="works.3.desc">E-commerce experience redesign</p>
+
+                    <div class="work-category-card">
+                        <!-- We can use a DOM-based typing container or canvas. Let's use DOM for crisp text rendering -->
+                        <div id="code-bg-container" class="category-bg-canvas code-bg-container"></div>
+                        <div class="category-overlay code-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-number">03</span>
+                            <h3 class="category-title" data-i18n="works.cat3.title">IT<br>Solutions</h3>
+                            <p class="category-desc" data-i18n="works.cat3.desc">Full-stack development, cloud
+                                architecture, and scalable software applications.</p>
+                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></a>
                         </div>
                     </div>
                 </div>
@@ -95,25 +111,28 @@
                 <h2 class="section-title" data-i18n="about.title">About Me</h2>
                 <div class="about-content">
                     <p class="about-text" data-i18n="about.text">
-                        I'm a creative visual designer with over 8 years of experience crafting
-                        digital experiences that blend aesthetics with functionality. My passion
-                        lies in creating designs that not only look beautiful but also tell
-                        compelling stories.
+                        Motivated IT specialist with a degree in Business Information Technology, fluent technical
+                        English, and hands-on experience in network & system administration. Over a year of practical
+                        Linux server hardening, web infrastructure deployment, network protocol analysis, and log
+                        monitoring. Passionate about cybersecurity, troubleshooting, and building secure systems.
                     </p>
                     <div class="skills-container">
-                        <div class="skill-tag" data-i18n="skills.1">UI/UX Design</div>
-                        <div class="skill-tag" data-i18n="skills.2">Brand Identity</div>
-                        <div class="skill-tag" data-i18n="skills.3">Motion Design</div>
-                        <div class="skill-tag" data-i18n="skills.4">Prototyping</div>
-                        <div class="skill-tag" data-i18n="skills.5">Design Systems</div>
+                        <div class="skill-tag" data-i18n="skills.1">Linux Administration</div>
+                        <div class="skill-tag" data-i18n="skills.2">Network Security</div>
+                        <div class="skill-tag" data-i18n="skills.3">TCP/IP & DNS</div>
+                        <div class="skill-tag" data-i18n="skills.4">Bash & Python</div>
+                        <div class="skill-tag" data-i18n="skills.5">3D & Graphic Design</div>
+                        <div class="skill-tag" data-i18n="skills.6">Branding</div>
+                        <div class="skill-tag" data-i18n="skills.7">Firewall & SSH</div>
+                        <div class="skill-tag" data-i18n="skills.8">English C1</div>
                     </div>
                 </div>
                 <!-- Timeline Component -->
                 <div class="timeline-container">
                     <div class="timeline-header">
                         <h3 class="timeline-heading" data-i18n="timeline.title">Changelog from my journey</h3>
-                        <p class="timeline-subheading" data-i18n="timeline.subtitle">I've been working on Aceternity for
-                            the past 2 years. Here's a timeline of my journey.</p>
+                        <p class="timeline-subheading" data-i18n="timeline.subtitle">My professional path from
+                            university to IT security — design, servers, and everything in between.</p>
                     </div>
 
                     <div class="timeline-wrapper">
@@ -123,81 +142,130 @@
                             <div class="timeline-line-progress"></div>
                         </div>
 
+                        <!-- 2025 -->
+                        <div class="timeline-item">
+                            <div class="timeline-left">
+                                <div class="timeline-dot"></div>
+                                <h3 class="timeline-year-title">2025</h3>
+                            </div>
+                            <div class="timeline-right">
+                                <h3 class="timeline-year-mobile">2025</h3>
+                                <p class="timeline-text" data-i18n="timeline.2025.text">Continuing to administer my
+                                    private VPN service (20+ users) and personal web server. Finishing the Selectel
+                                    Linux System Administrator course. Actively developing in cybersecurity — reading
+                                    Habr, studying protocols, hardening servers.</p>
+                                <div class="timeline-checklist">
+                                    <div class="check-item" data-i18n="timeline.2025.check1">🔒 VPN service (VLESS +
+                                        Reality) — 20+ users, ongoing monitoring</div>
+                                    <div class="check-item" data-i18n="timeline.2025.check2">📜 Selectel — Linux
+                                        Sysadmin course (completing)</div>
+                                    <div class="check-item" data-i18n="timeline.2025.check3">🌐 Personal website on own
+                                        server with SSL & DNS</div>
+                                    <div class="check-item" data-i18n="timeline.2025.check4">🛡️ Server hardening: SSH
+                                        keys, firewall, port management</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 2024 -->
                         <div class="timeline-item">
-                            <!-- Sticky Left Column -->
                             <div class="timeline-left">
                                 <div class="timeline-dot"></div>
                                 <h3 class="timeline-year-title">2024</h3>
                             </div>
-                            <!-- Right Content Column -->
                             <div class="timeline-right">
-                                <h3 class="timeline-year-mobile">2024</h3> <!-- Mobile Only -->
-                                <p class="timeline-text">Built and launched Aceternity UI and Aceternity UI Pro from
-                                    scratch</p>
-                                <div class="timeline-grid">
-                                    <img src="https://assets.aceternity.com/templates/startup-1.webp"
-                                        alt="startup template" class="timeline-img">
-                                    <img src="https://assets.aceternity.com/templates/startup-2.webp"
-                                        alt="startup template" class="timeline-img">
-                                    <img src="https://assets.aceternity.com/templates/startup-3.webp"
-                                        alt="startup template" class="timeline-img">
-                                    <img src="https://assets.aceternity.com/templates/startup-4.webp"
-                                        alt="startup template" class="timeline-img">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Early 2023 -->
-                        <div class="timeline-item">
-                            <div class="timeline-left">
-                                <div class="timeline-dot"></div>
-                                <h3 class="timeline-year-title">Early 2023</h3>
-                            </div>
-                            <div class="timeline-right">
-                                <h3 class="timeline-year-mobile">Early 2023</h3>
-                                <p class="timeline-text mb-4">I usually run out of copy, but when I see content this
-                                    big, I try to integrate lorem ipsum.</p>
-                                <p class="timeline-text">Lorem ipsum is for people who are too lazy to write copy. But
-                                    we are not. Here are some more example of beautiful designs I built.</p>
-                                <div class="timeline-grid">
-                                    <img src="https://assets.aceternity.com/pro/hero-sections.png" alt="hero template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/features-section.png" alt="feature template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/pro/bento-grids.png" alt="bento template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/cards.png" alt="cards template"
-                                        class="timeline-img">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Changelog -->
-                        <div class="timeline-item">
-                            <div class="timeline-left">
-                                <div class="timeline-dot"></div>
-                                <h3 class="timeline-year-title">Changelog</h3>
-                            </div>
-                            <div class="timeline-right">
-                                <h3 class="timeline-year-mobile">Changelog</h3>
-                                <p class="timeline-text mb-4">Deployed 5 new components on Aceternity today</p>
+                                <h3 class="timeline-year-mobile">2024</h3>
+                                <p class="timeline-text" data-i18n="timeline.2024.text">Launched private VPN service and
+                                    streaming platform. Developed a custom whitelist bypass protocol in Python. Went
+                                    self-employed — 3D modeling & design freelancing while building out IT
+                                    infrastructure.</p>
                                 <div class="timeline-checklist">
-                                    <div class="check-item">✅ Card grid component</div>
-                                    <div class="check-item">✅ Startup template Aceternity</div>
-                                    <div class="check-item">✅ Random file upload lol</div>
-                                    <div class="check-item">✅ Himesh Reshammiya Music CD</div>
-                                    <div class="check-item">✅ Salman Bhai Fan Club registrations open</div>
+                                    <div class="check-item" data-i18n="timeline.2024.check1">🚀 Deployed VLESS + Reality
+                                        VPN server from scratch</div>
+                                    <div class="check-item" data-i18n="timeline.2024.check2">📡 Built streaming platform
+                                        (gRPC + Nginx) with IP filtering & auth</div>
+                                    <div class="check-item" data-i18n="timeline.2024.check3">🐍 Developed whitelist
+                                        bypass protocol (Python)</div>
+                                    <div class="check-item" data-i18n="timeline.2024.check4">🎨 Self-employed: 3D
+                                        modeling & design freelancing</div>
+                                    <div class="check-item" data-i18n="timeline.2024.check5">🔍 Network auditing with
+                                        Nmap</div>
                                 </div>
-                                <div class="timeline-grid">
-                                    <img src="https://assets.aceternity.com/pro/hero-sections.png" alt="hero template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/features-section.png" alt="feature template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/pro/bento-grids.png" alt="bento template"
-                                        class="timeline-img">
-                                    <img src="https://assets.aceternity.com/cards.png" alt="cards template"
-                                        class="timeline-img">
+                            </div>
+                        </div>
+
+                        <!-- 2021–2024 -->
+                        <div class="timeline-item">
+                            <div class="timeline-left">
+                                <div class="timeline-dot"></div>
+                                <h3 class="timeline-year-title">2021–2024</h3>
+                            </div>
+                            <div class="timeline-right">
+                                <h3 class="timeline-year-mobile">2021–2024</h3>
+                                <p class="timeline-text" data-i18n="timeline.2021.text">Designer at Telesett LLC
+                                    (PhosAgro subsidiary). Entrusted with the most high-profile projects from major
+                                    clients. Created information security awareness posters for PhosAgro employees.</p>
+                                <div class="timeline-checklist">
+                                    <div class="check-item" data-i18n="timeline.2021.check1">🏔️ BigWood ski resort —
+                                        trail map design</div>
+                                    <div class="check-item" data-i18n="timeline.2021.check2">✈️ Khibiny Airport —
+                                        complete brandbook development</div>
+                                    <div class="check-item" data-i18n="timeline.2021.check3">🏕️ Sosnovka recreation
+                                        base — map design</div>
+                                    <div class="check-item" data-i18n="timeline.2021.check4">🛡️ InfoSec awareness
+                                        posters for PhosAgro</div>
+                                    <div class="check-item" data-i18n="timeline.2021.check5">🖨️ Print design,
+                                        advertising, banners, merchandise</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2020 -->
+                        <div class="timeline-item">
+                            <div class="timeline-left">
+                                <div class="timeline-dot"></div>
+                                <h3 class="timeline-year-title">2020</h3>
+                            </div>
+                            <div class="timeline-right">
+                                <h3 class="timeline-year-mobile">2020</h3>
+                                <p class="timeline-text" data-i18n="timeline.2020.text">Teacher at GAUDO "Laplandia" —
+                                    Industrial Design & Hi-Tech. Set up a local network and file server in the
+                                    classroom. Configured all workstations, internet access, and connected 3D printers
+                                    and CNC machines.</p>
+                                <div class="timeline-checklist">
+                                    <div class="check-item" data-i18n="timeline.2020.check1">🖧 Built local LAN & file
+                                        server for the classroom</div>
+                                    <div class="check-item" data-i18n="timeline.2020.check2">💻 Configured all laptops,
+                                        internet access & network policies</div>
+                                    <div class="check-item" data-i18n="timeline.2020.check3">🎓 Duke University — Data
+                                        Science Math Skills (Jan 2020)</div>
+                                    <div class="check-item" data-i18n="timeline.2020.check4">🎓 University of Minnesota
+                                        — Analysis for Business Systems (May 2020)</div>
+                                    <div class="check-item" data-i18n="timeline.2020.check5">🖨️ Taught CAD, Blender, 3D
+                                        printing, photogrammetry</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- University -->
+                        <div class="timeline-item">
+                            <div class="timeline-left">
+                                <div class="timeline-dot"></div>
+                                <h3 class="timeline-year-title">University</h3>
+                            </div>
+                            <div class="timeline-right">
+                                <h3 class="timeline-year-mobile">University</h3>
+                                <p class="timeline-text" data-i18n="timeline.uni.text">Graduated from Lapland University
+                                    of Applied Sciences (Finland). Bachelor of Business Administration — Business
+                                    Information Technology specialization. All coursework in English. Thesis on
+                                    Artificial Intelligence.</p>
+                                <div class="timeline-checklist">
+                                    <div class="check-item" data-i18n="timeline.uni.check1">🎓 Lapland UAS — BBA,
+                                        Business Information Technology</div>
+                                    <div class="check-item" data-i18n="timeline.uni.check2">🤖 Thesis on AI technologies
+                                        (academic English)</div>
+                                    <div class="check-item" data-i18n="timeline.uni.check3">🌍 Full English-language
+                                        instruction</div>
                                 </div>
                             </div>
                         </div>
@@ -211,14 +279,14 @@
             <div class="section-content">
                 <h2 class="section-title" data-i18n="contact.title">Get in Touch</h2>
                 <div class="contact-content">
-                    <p class="contact-text" data-i18n="contact.text">Ready to bring your vision to life? Let's create
-                        something amazing together.
-                    </p>
-                    <a href="mailto:hello@designer.com" class="contact-email">hello@designer.com</a>
+                    <p class="contact-text" data-i18n="contact.text">Interested in working together or have a project in
+                        mind? Let's talk.</p>
+                    <a href="mailto:gdanovevgeniy@yandex.ru" class="contact-email">gdanovevgeniy@yandex.ru</a>
                     <div class="social-links">
-                        <a href="#" class="social-link">Dribbble</a>
-                        <a href="#" class="social-link">Behance</a>
-                        <a href="#" class="social-link">LinkedIn</a>
+                        <a href="tel:+79533023252" class="social-link" data-i18n="contact.phone">+7 (953) 302-32-52</a>
+                        <a href="https://t.me/zhdqnov" class="social-link">Telegram</a>
+                        <a href="https://vk.com/ellyll" class="social-link">VK</a>
+                        <a href="https://www.artstation.com/nofkn" class="social-link">ArtStation</a>
                     </div>
                 </div>
             </div>
