@@ -70,6 +70,7 @@
 html {
     font-size: 16px;
     scroll-behavior: smooth;
+    min-height: -webkit-fill-available;
 }
 
 body {
@@ -78,6 +79,8 @@ body {
     color: var(--color-text-primary);
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;
+    min-height: -webkit-fill-available;
     line-height: 1.6;
 }
 
@@ -302,8 +305,8 @@ body {
 .main-content {
     position: relative;
     z-index: 1;
-    z-index: 1;
     height: 100vh;
+    height: 100dvh;
 }
 
 .section {
@@ -312,12 +315,14 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     padding: var(--spacing-xl);
-    padding-bottom: 120px;
+    padding-top: calc(var(--spacing-xl) + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
     /* Space for nav */
     box-sizing: border-box;
     opacity: 0;
@@ -1625,8 +1630,11 @@ body {
     }
 
     .section {
-        /* "Little padding" - maximizing screen real estate */
+        /* "Little padding" - maximizing screen real estate but explicitly retaining safe area */
         padding: var(--spacing-md) var(--spacing-sm);
+        padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+        /* Safe padding for bottom nav */
     }
 
     .works-section {
@@ -1636,7 +1644,9 @@ body {
 
     .works-section .section-content {
         margin: 0;
-        display: block;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     .works-grid {
@@ -1646,12 +1656,13 @@ body {
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
         gap: var(--spacing-md);
-        /* Offset the grid further up to clear glow, and pad bottom heavily to clear nav */
-        padding: 80px 20px 200px 20px;
-        margin: -80px -20px 0 -20px;
-        aspect-ratio: auto;
-        height: auto;
+        /* Offset the grid further up to clear glow */
+        padding: 50px 20px 50px 20px;
+        margin: -50px -20px -20px -20px;
+        flex: 1;
+        min-height: 0;
         max-height: none;
+        align-items: stretch;
         /* Hide scrollbar for cleaner look */
         scrollbar-width: none;
         -ms-overflow-style: none;
@@ -1662,13 +1673,13 @@ body {
     }
 
     .work-category-card {
-        flex: 0 0 80vw;
-        max-width: 80vw;
+        flex: 0 0 82vw;
+        max-width: 82vw;
         scroll-snap-align: center;
-        /* Tall cards on mobile - using vh but with a sensible min/max */
-        height: 80vh;
-        min-height: 400px;
-        max-height: 650px;
+        /* Take the height of the container natively so they always fit perfectly */
+        height: 100%;
+        min-height: 0;
+        max-height: none;
     }
 
     /* Hide language button on mobile - doesn't fit */
@@ -1758,6 +1769,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     z-index: 9999;
     pointer-events: auto;
     display: flex;

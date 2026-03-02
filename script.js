@@ -655,6 +655,17 @@ function navigateToSection(sectionId) {
         targetSection.style.opacity = '1';
         targetSection.style.transform = 'translateY(0) scale(1)';
 
+        // Mobile specific: center the middle works card when opening section
+        if (sectionId === 'works' && window.innerWidth <= 768) {
+            const worksGrid = targetSection.querySelector('.works-grid');
+            if (worksGrid) {
+                setTimeout(() => {
+                    const centerOffset = (worksGrid.scrollWidth - worksGrid.clientWidth) / 2;
+                    worksGrid.scrollTo({ left: centerOffset, behavior: 'smooth' });
+                }, 50);
+            }
+        }
+
         // Ensure we don't accidentally handle it as exiting later
         if (exitTimeouts[sectionId]) {
             clearTimeout(exitTimeouts[sectionId]);
