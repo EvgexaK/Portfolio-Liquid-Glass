@@ -120,20 +120,10 @@ async function loadProjects(category) {
     projectList.innerHTML = '<div class="project-list-empty">Loading projects...</div>';
 
     try {
-        const resp = await fetch(`api/projects.php?category=${category}&t=${Date.now()}`);
-        if (!resp.ok) throw new Error('API failed');
-
-        const text = await resp.text();
-
-        // If the server returned the raw PHP file (unexecuted), fallback to static JSON
-        if (text.trim().startsWith('<?php') || text.trim().startsWith('<')) {
-            console.log('PHP not executed. Falling back to static JSON...');
-            const fallbackResp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
-            const fallbackData = await fallbackResp.json();
-            showcaseProjects = fallbackData[category] || [];
-        } else {
-            showcaseProjects = JSON.parse(text);
-        }
+        const resp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
+        if (!resp.ok) throw new Error('Failed to load projects JSON');
+        const data = await resp.json();
+        showcaseProjects = data[category] || [];
     } catch (e) {
         console.warn('Failed to load projects:', e);
         showcaseProjects = [];
@@ -575,21 +565,17 @@ function updateArrows() {
 let showcasePreloadedData = {};
 
 /**
- * Pre-load all project lists in background
+ * Pre-load project list JSON in background for browser cache
  */
 async function preloadShowcase() {
-    const categories = ['3d', 'design', 'it'];
-    for (const cat of categories) {
-        try {
-            const resp = await fetch(`api/projects.php?category=${cat}&t=${Date.now()}`);
-            if (resp.ok) {
-                const data = await resp.json();
-                showcasePreloadedData[cat] = data;
-                console.log(`Preloaded ${cat} projects list.`);
-            }
-        } catch (e) {
-            // Ignore pre-loading errors
+    try {
+        const resp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
+        if (resp.ok) {
+            showcasePreloadedData = await resp.json();
+            console.log('Preloaded projects list.');
         }
+    } catch (e) {
+        // Ignore pre-loading errors
     }
 }
 
