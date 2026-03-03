@@ -8,8 +8,10 @@
     <title>Evgenii Zhdanov | IT & Design</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <!-- Self-hosted fonts (SIL OFL licensed) — no external requests -->
+    <!-- Core Styles -->
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css?v=1.5">
+    <link rel="stylesheet" href="showcase.css?v=1.4">
     <link rel="stylesheet" href="high-res.css">
 </head>
 
@@ -59,7 +61,7 @@
             <div class="section-content">
                 <h2 class="section-title" data-i18n="works.title">Categories</h2>
                 <div class="works-grid">
-                    <div class="work-category-card">
+                    <div class="work-category-card" onclick="openShowcase('3d', event)" style="cursor: pointer;">
                         <canvas id="canvas-3d" class="category-bg-canvas"></canvas>
                         <div class="category-overlay"></div>
                         <div class="category-content">
@@ -67,12 +69,12 @@
                             <h3 class="category-title" data-i18n="works.cat1.title">3D<br>Projects</h3>
                             <p class="category-desc" data-i18n="works.cat1.desc">Photorealistic modeling, animation, and
                                 character design for games and visual effects.</p>
-                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
-                                    style="font-size:1.2em">→</span></a>
+                            <span class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></span>
                         </div>
                     </div>
 
-                    <div class="work-category-card">
+                    <div class="work-category-card" onclick="openShowcase('design', event)" style="cursor: pointer;">
                         <canvas id="canvas-design" class="category-bg-canvas"></canvas>
                         <div class="category-overlay"></div>
                         <div class="category-content">
@@ -80,12 +82,12 @@
                             <h3 class="category-title" data-i18n="works.cat2.title">Design<br>Works</h3>
                             <p class="category-desc" data-i18n="works.cat2.desc">Brand identity creation, UI/UX design,
                                 and print media for diverse clients.</p>
-                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
-                                    style="font-size:1.2em">→</span></a>
+                            <span class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></span>
                         </div>
                     </div>
 
-                    <div class="work-category-card">
+                    <div class="work-category-card" onclick="openShowcase('it', event)" style="cursor: pointer;">
                         <!-- We can use a DOM-based typing container or canvas. Let's use DOM for crisp text rendering -->
                         <div id="code-bg-container" class="category-bg-canvas code-bg-container"></div>
                         <div class="category-overlay code-overlay"></div>
@@ -94,8 +96,8 @@
                             <h3 class="category-title" data-i18n="works.cat3.title">IT<br>Solutions</h3>
                             <p class="category-desc" data-i18n="works.cat3.desc">Full-stack development, cloud
                                 architecture, and scalable software applications.</p>
-                            <a href="#" class="category-link" data-i18n="works.explore">Explore Category <span
-                                    style="font-size:1.2em">→</span></a>
+                            <span class="category-link" data-i18n="works.explore">Explore Category <span
+                                    style="font-size:1.2em">→</span></span>
                         </div>
                     </div>
                 </div>
@@ -368,10 +370,73 @@
             <div class="loader"></div>
         </div>
     </div>
+    <!-- Seamless Showcase Overlay -->
+    <section id="showcase-overlay" class="showcase-overlay">
+        <aside class="project-panel">
+            <div class="project-panel-header">
+                <span class="panel-label">SELECTED WORKS</span>
+                <h2 class="panel-title" id="showcase-title">Showcase</h2>
+            </div>
+            <div class="project-list" id="project-list">
+                <!-- Populated dynamically via PHP api -->
+            </div>
+        </aside>
 
-    <script src="shader-bg.js"></script>
+        <section class="viewer-panel">
+            <div class="viewer-wrapper">
+                <!-- Close Button moved out of container to avoid overflow:hidden clipping -->
+                <button class="viewer-close-btn" onclick="closeShowcase()" aria-label="Close Showcase">
+                    ✕
+                </button>
+                <div class="viewer-container">
+                    <div class="viewer-empty-state" id="viewer-empty" style="display:flex;">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
+                            opacity="0.3">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                        <p>Select a project to view</p>
+                    </div>
+                    <!-- Slides Container -->
+                    <div class="viewer-slides" id="viewer-slides" style="display:none;">
+                        <div class="slide-display" id="slide-display"></div>
+                    </div>
+                </div>
+
+                <!-- Controls now live underneath the viewer container -->
+                <div class="viewer-controls" id="viewer-controls" style="display:none;">
+                    <button class="slide-arrow slide-prev" id="slide-prev" aria-label="Previous slide">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="slide-indicators" id="slide-indicators"></div>
+                    <span class="slide-counter" id="slide-counter">01 / 01</span>
+                    <button class="slide-arrow slide-next" id="slide-next" aria-label="Next slide">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- Scripts -->
+    <script src="shader-bg.js?v=1.1"></script>
     <script src="loader.js"></script>
-    <script src="script.js?v=1.5"></script>
+    <!-- PDF.js for rendering PDF files directly in JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
+    <script src="showcase.js?v=2.5"></script>
+    <script src="script.js?v=1.9"></script>
 </body>
 
 </html>

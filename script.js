@@ -81,7 +81,9 @@ function initLanguageSwitcher() {
             "nav.works": "Works",
             "nav.about": "About",
             "nav.contact": "Contact",
-            "hero.name": "Evgenii Zhdanov"
+            "hero.name": "Evgenii Zhdanov",
+            "project.восточный рудник календарь": "Vostochny Mine Calendar",
+            "project.руководство по оформлению": "Design Guidelines"
         },
         ru: {
             "hero.line1": "Цифровой",
@@ -145,7 +147,9 @@ function initLanguageSwitcher() {
             "nav.works": "Работы",
             "nav.about": "Инфо",
             "nav.contact": "Контакты",
-            "hero.name": "Евгений Жданов"
+            "hero.name": "Евгений Жданов",
+            "project.восточный рудник календарь": "Восточный рудник календарь",
+            "project.руководство по оформлению": "Руководство по оформлению"
         }
     };
 
@@ -158,6 +162,7 @@ function initLanguageSwitcher() {
 
     // Set initial language based on browser preference
     let currentLang = isRussian ? 'ru' : 'en';
+    window.currentAppLanguage = currentLang; // Expose globally for showcase.js
 
     const ruFlag = `
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -203,6 +208,11 @@ function initLanguageSwitcher() {
                 langBtn.style.transform = 'scale(1)';
                 const nextLang = currentLang === 'en' ? 'ru' : 'en';
                 currentLang = nextLang;
+                window.currentAppLanguage = currentLang; // Update global state
+
+                // Dispatch event so showcase.js can re-translate its contents if open
+                window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang: currentLang } }));
+
                 window.dispatchEvent(new Event('toggle-theme'));
                 langIcon.style.opacity = '0';
                 langIcon.style.transform = 'rotate(30deg) scale(0.8)';
@@ -485,17 +495,18 @@ function initLiquidGlassNav() {
         const isTopMode = navWrapper.classList.contains('nav-top-mode');
 
         if (isTopMode) {
-            // Top mode: position circle centered on button
-            const circleSize = 36;
-            const btnCenter = targetLeft + (rect.width / 2);
-            const circleLeft = btnCenter - (circleSize / 2);
-
             if (animate) {
                 indicator.style.transition = 'all 0.35s cubic-bezier(0.25, 1.5, 0.5, 1), opacity 0.3s ease';
             } else {
                 indicator.style.transition = 'none';
             }
+
+            // REVERTED to dynamic calculation to prevent clipping on different screen sizes
+            const circleSize = 36;
+            const btnCenter = targetLeft + (rect.width / 2);
+            const circleLeft = btnCenter - (circleSize / 2);
             indicator.style.left = `${circleLeft}px`;
+
             // Width/height/border-radius handled by CSS
             if (!animate) {
                 indicator.offsetHeight;
@@ -699,8 +710,19 @@ window.addEventListener('resize', debounce(() => {
         const containerRect = navContainer.getBoundingClientRect();
 
         indicator.style.transition = 'none';
-        indicator.style.left = `${rect.left - containerRect.left}px`;
-        indicator.style.width = `${rect.width}px`;
+
+        const navWrapper = document.querySelector('.liquid-glass-nav');
+
+        if (navWrapper && navWrapper.classList.contains('nav-top-mode')) {
+            // Force a circular 36px bubble centered on the button
+            indicator.style.width = `36px`;
+            indicator.style.left = `${(rect.left - containerRect.left) + (rect.width / 2) - 18}px`;
+        } else {
+            // Normal mode: stretch across button width
+            indicator.style.width = `${rect.width}px`;
+            indicator.style.left = `${rect.left - containerRect.left}px`;
+        }
+
         indicator.offsetHeight;
         indicator.style.transition = '';
     }

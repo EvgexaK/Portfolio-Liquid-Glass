@@ -206,7 +206,7 @@
 
   // Color palettes per section (matching existing site vibe)
   const themes = [
-    // 0: Hero — deep blues, violet, cyan, pink (Added more blacks for depth)
+    // 0: Hero — deep blues, violet, cyan, pink
     ['#000000', '#020408', '#050a12', '#38bdf8', '#8b5cf6', '#ec4899', '#000000'].map(hexToGL),
     // 1: Works — warmer, orange-shifted
     ['#000000', '#020408', '#050a12', '#f59e0b', '#8b5cf6', '#ec4899', '#000000'].map(hexToGL),
@@ -214,6 +214,12 @@
     ['#000000', '#020408', '#050a12', '#14b8a6', '#0ea5e9', '#8b5cf6', '#000000'].map(hexToGL),
     // 3: Contact — purple/gold
     ['#000000', '#020408', '#050a12', '#a855f7', '#eab308', '#ec4899', '#000000'].map(hexToGL),
+    // 4: 3D Showcase Overlay
+    ['#000000', '#020408', '#050a12', '#f59e0b', '#f97316', '#dc2626', '#000000'].map(hexToGL),
+    // 5: Design Showcase Overlay
+    ['#000000', '#020408', '#050a12', '#ec4899', '#f43f5e', '#8b5cf6', '#000000'].map(hexToGL),
+    // 6: IT Showcase Overlay
+    ['#000000', '#020408', '#050a12', '#06b6d4', '#14b8a6', '#3b82f6', '#000000'].map(hexToGL)
   ];
 
   // ─── Init ───────────────────────────────────────────────────────
@@ -317,7 +323,7 @@
     targetOffset = index * 0.15;
   }
 
-  // Listen for section changes from nav
+  // Listen for section changes from nav and showcase overlay
   window.addEventListener('set-theme', (e) => {
     setThemeColors(e.detail.index);
   });
