@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiquidGlassNav();
     initSectionNavigation();
     initLanguageSwitcher();
-    initLanguageSwitcher(); // Note: duplicate in original code, leaving it
     initTimeline();
     initCategoryAnimations();
 });
@@ -17,109 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
  * Toggles between RU and EN flags
  */
 function initLanguageSwitcher() {
-    const langBtn = document.querySelector('.lang-btn');
-    const langIcon = document.querySelector('.lang-icon');
-
-    // Detect browser/system language - check if Russian
-    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
-    const isRussian = browserLang.toLowerCase().startsWith('ru');
-
-    // Set initial language based on browser preference
-    // Set initial language based on browser preference
-    let currentLang = isRussian ? 'ru' : 'en';
-
-    // ... (rest of language switcher logic moved down or preserved) ...
-
-    const ruFlag = `
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="24" height="24" rx="12" fill="#F5F5F5"/>
-            <path d="M24 16C24 20.4183 20.4183 24 16 24H8C3.58172 24 0 20.4183 0 16V16H24V16Z" fill="#D52B1E"/>
-            <path d="M24 8H0V16H24V8Z" fill="#0039A6"/>
-            <path d="M0 8C0 3.58172 3.58172 0 8 0H16C20.4183 0 24 3.58172 24 8V8H0V8Z" fill="white"/>
-        </svg>
-    `;
-
-    const enFlag = `
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 50%;">
-            <defs>
-                <clipPath id="circle-clip">
-                    <rect width="24" height="24" rx="12"/>
-                </clipPath>
-            </defs>
-            <g clip-path="url(#circle-clip)">
-                <rect width="24" height="24" fill="#012169"/>
-                <path d="M0 0L24 24M24 0L0 24" stroke="white" stroke-width="4"/>
-                <path d="M0 0L24 24M24 0L0 24" stroke="#C8102E" stroke-width="2"/>
-                <path d="M12 0V24M0 12H24" stroke="white" stroke-width="6"/>
-                <path d="M12 0V24M0 12H24" stroke="#C8102E" stroke-width="3"/>
-            </g>
-        </svg>
-    `;
-
-    if (langBtn && langIcon) {
-        langIcon.innerHTML = currentLang === 'en' ? ruFlag : enFlag;
-
-        if (isRussian) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations.ru[key]) {
-                    el.textContent = translations.ru[key];
-                }
-            });
-        }
-
-        langBtn.addEventListener('click', () => {
-            langBtn.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                langBtn.style.transform = 'scale(1)';
-                const nextLang = currentLang === 'en' ? 'ru' : 'en';
-                currentLang = nextLang;
-                window.dispatchEvent(new Event('toggle-theme'));
-                langIcon.style.opacity = '0';
-                langIcon.style.transform = 'rotate(30deg) scale(0.8)';
-
-                setTimeout(() => {
-                    const showRuFlag = currentLang === 'en';
-                    langIcon.innerHTML = showRuFlag ? ruFlag : enFlag;
-                    langIcon.style.opacity = '1';
-                    langIcon.style.transform = 'rotate(0) scale(1)';
-                    langIcon.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                }, 200);
-
-                translateContent(currentLang);
-            }, 100);
-        });
-    }
-
-    function translateContent(lang) {
-        document.querySelectorAll('[data-i18n]').forEach((el, index) => {
-            const key = el.getAttribute('data-i18n');
-            if (translations[lang][key]) {
-                const delay = index * 10;
-                setTimeout(() => {
-                    el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                    el.style.filter = 'blur(10px)';
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(4px) scale(0.95)';
-
-                    setTimeout(() => {
-                        el.textContent = translations[lang][key];
-                        el.style.filter = 'blur(0px)';
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0) scale(1)';
-
-                        if (key.startsWith('nav.')) {
-                            requestAnimationFrame(() => {
-                                window.dispatchEvent(new Event('resize'));
-                            });
-                        }
-                    }, 400);
-                }, delay);
-            }
-        });
-    }
-
     // ─── Constants & Config ──────────────────────────────────────────
+    // Must be declared before any code that references it (TDZ fix)
     const translations = {
         en: {
             "hero.line1": "Digital",
@@ -250,6 +148,105 @@ function initLanguageSwitcher() {
             "hero.name": "Евгений Жданов"
         }
     };
+
+    const langBtn = document.querySelector('.lang-btn');
+    const langIcon = document.querySelector('.lang-icon');
+
+    // Detect browser/system language - check if Russian
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+    const isRussian = browserLang.toLowerCase().startsWith('ru');
+
+    // Set initial language based on browser preference
+    let currentLang = isRussian ? 'ru' : 'en';
+
+    const ruFlag = `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="12" fill="#F5F5F5"/>
+            <path d="M24 16C24 20.4183 20.4183 24 16 24H8C3.58172 24 0 20.4183 0 16V16H24V16Z" fill="#D52B1E"/>
+            <path d="M24 8H0V16H24V8Z" fill="#0039A6"/>
+            <path d="M0 8C0 3.58172 3.58172 0 8 0H16C20.4183 0 24 3.58172 24 8V8H0V8Z" fill="white"/>
+        </svg>
+    `;
+
+    const enFlag = `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 50%;">
+            <defs>
+                <clipPath id="circle-clip">
+                    <rect width="24" height="24" rx="12"/>
+                </clipPath>
+            </defs>
+            <g clip-path="url(#circle-clip)">
+                <rect width="24" height="24" fill="#012169"/>
+                <path d="M0 0L24 24M24 0L0 24" stroke="white" stroke-width="4"/>
+                <path d="M0 0L24 24M24 0L0 24" stroke="#C8102E" stroke-width="2"/>
+                <path d="M12 0V24M0 12H24" stroke="white" stroke-width="6"/>
+                <path d="M12 0V24M0 12H24" stroke="#C8102E" stroke-width="3"/>
+            </g>
+        </svg>
+    `;
+
+    if (langBtn && langIcon) {
+        langIcon.innerHTML = currentLang === 'en' ? ruFlag : enFlag;
+
+        if (isRussian) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations.ru[key]) {
+                    el.textContent = translations.ru[key];
+                }
+            });
+        }
+
+        langBtn.addEventListener('click', () => {
+            langBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                langBtn.style.transform = 'scale(1)';
+                const nextLang = currentLang === 'en' ? 'ru' : 'en';
+                currentLang = nextLang;
+                window.dispatchEvent(new Event('toggle-theme'));
+                langIcon.style.opacity = '0';
+                langIcon.style.transform = 'rotate(30deg) scale(0.8)';
+
+                setTimeout(() => {
+                    const showRuFlag = currentLang === 'en';
+                    langIcon.innerHTML = showRuFlag ? ruFlag : enFlag;
+                    langIcon.style.opacity = '1';
+                    langIcon.style.transform = 'rotate(0) scale(1)';
+                    langIcon.style.transition = 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                }, 200);
+
+                translateContent(currentLang);
+            }, 100);
+        });
+    }
+
+    function translateContent(lang) {
+        document.querySelectorAll('[data-i18n]').forEach((el, index) => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                const delay = index * 10;
+                setTimeout(() => {
+                    el.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.filter = 'blur(10px)';
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(4px) scale(0.95)';
+
+                    setTimeout(() => {
+                        el.textContent = translations[lang][key];
+                        el.style.filter = 'blur(0px)';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0) scale(1)';
+
+                        if (key.startsWith('nav.')) {
+                            requestAnimationFrame(() => {
+                                window.dispatchEvent(new Event('resize'));
+                            });
+                        }
+                    }, 400);
+                }, delay);
+            }
+        });
+    }
 }
 
 // ─── Custom Inertial Smooth Scroll ──────────────────────────────
