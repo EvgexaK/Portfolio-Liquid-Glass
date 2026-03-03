@@ -1,0 +1,9 @@
+# Development tools (not needed on server)
+dev-server.js
+node_modules/
+
+# Fallback JSON (auto-generated, server uses PHP)
+api/projects-fallback.json
+
+# Old standalone category pages (replaced by SPA overlay)
+3d/

@@ -963,7 +963,7 @@ body {
 
 .category-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    font-size: clamp(2.8rem, 5vw, 5.2rem);
     font-weight: 500;
     line-height: 1.0;
     margin: 0 0 12px 0;
@@ -1332,10 +1332,15 @@ body {
 /* Show indicator as bubbly circle in top mode */
 .liquid-glass-nav.nav-top-mode .nav-indicator {
     border-radius: 50%;
+    /* Let the bubble inherit its width naturally from JS, 
+       just constrain the height to match a circle */
     width: 36px !important;
     height: 36px !important;
     top: 50% !important;
     transform: translateY(-50%) translateZ(0) !important;
+    margin-top: 0;
+    transition: all 0.2s ease-out, opacity 0.3s ease;
+    /* Fast transition to prevent slow shrinking stretch */
 }
 
 .liquid-glass-nav.nav-top-mode .nav-btn.active {
