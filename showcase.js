@@ -333,6 +333,9 @@ async function loadSlides(project, category) {
     }
 
     showcaseIsLoading = false;
+
+    // Eagerly render all remaining PDF pages in background
+    preRenderAllPages();
 }
 
 // ─── Lazy PDF Page Renderer ──────────────────────────────────
@@ -434,8 +437,7 @@ function renderSlide(index) {
     }
 
     renderSlideElement(slide, index);
-    // Pre-render adjacent pages in background
-    preRenderAdjacent(index);
+    // Background render continues via preRenderAllPages()
 }
 
 /**
@@ -484,17 +486,18 @@ function renderSlideElement(slide, index) {
 }
 
 /**
- * Pre-renders the slides adjacent to the current one (±1)
- * so they're instant when the user navigates.
+ * Eagerly renders ALL unrendered PDF pages in the background.
+ * Called once after the first slide is displayed so all pages
+ * are ready by the time the user navigates to them.
  */
-function preRenderAdjacent(currentIndex) {
-    const neighbors = [currentIndex - 1, currentIndex + 1];
-    for (const idx of neighbors) {
-        if (idx >= 0 && idx < showcaseSlides.length) {
-            const s = showcaseSlides[idx];
-            if (s.type === 'pdf' && !s.rendered) {
-                renderPDFPage(s); // Fire and forget
-            }
+async function preRenderAllPages() {
+    const loadId = currentLoadId; // Snapshot to detect stale renders
+    for (let i = 0; i < showcaseSlides.length; i++) {
+        // Bail if user switched to a different project
+        if (currentLoadId !== loadId) return;
+        const s = showcaseSlides[i];
+        if (s.type === 'pdf' && !s.rendered) {
+            await renderPDFPage(s);
         }
     }
 }
