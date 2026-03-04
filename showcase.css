@@ -172,7 +172,8 @@ body.showcase-active main {
     flex: 1;
     /* Takes up remaining height above controls */
     border-radius: 20px;
-    /* overflow: hidden removed so close button outside is visible */
+    /* overflow: hidden clips zoomed content to rounded corners (close btn is in .viewer-wrapper, not here) */
+    overflow: hidden;
     background: rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -249,8 +250,8 @@ body.showcase-active main {
     /* Mask edges: content remains within bounds */
     min-height: 0;
     width: 100%;
-    /* Strict size containment so documents don't resize the viewer */
-    contain: strict;
+    /* Size containment so documents don't resize the viewer */
+    contain: layout style;
 }
 
 .slide-display img,
@@ -282,6 +283,16 @@ body.showcase-active main {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
+    will-change: transform;
+}
+
+/* Zoom cursor states */
+.slide-display.zoomed {
+    cursor: grab;
+}
+
+.slide-display.zoomed:active {
+    cursor: grabbing;
 }
 
 .slide-loading {
