@@ -399,40 +399,93 @@ body.showcase-active main {
 }
 
 @media (max-width: 900px) {
+
+    /* Full-screen column layout */
     .showcase-overlay {
         flex-direction: column;
-        padding-top: 70px;
+        padding-top: 100px;
     }
 
+    /* --- Project Panel: compact vertical list --- */
     .project-panel {
         width: 100%;
         min-width: 0;
-        max-height: 35vh;
-        padding: 20px;
+        max-height: 25vh;
+        padding: 12px 16px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .project-panel-header {
-        margin-bottom: 16px;
+        display: none;
+        /* Save vertical space on mobile */
     }
 
     .project-list {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
+        flex-direction: column;
+        gap: 2px;
     }
 
     .project-item {
-        padding: 8px 14px;
-        font-size: 0.95rem;
-        border-radius: 20px;
+        padding: 10px 14px;
+        font-size: 0.65rem;
+        border-radius: 8px;
+        position: relative;
     }
 
+    /* Left-side active indicator bar (replaces bullet) */
+    .project-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 25%;
+        height: 50%;
+        width: 3px;
+        border-radius: 2px;
+        background: transparent;
+        transition: background 0.3s ease;
+        font-size: 0;
+        /* Remove the bullet character */
+    }
+
+    .project-item.active::before {
+        background: var(--color-accent-orange);
+    }
+
+    /* --- Viewer Panel: edge-to-edge 16:10 --- */
     .viewer-panel {
-        padding: 12px;
+        padding: 8px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .viewer-wrapper {
+        height: 100%;
+        max-width: 100%;
     }
 
     .viewer-container {
         border-radius: 14px;
+        aspect-ratio: 16 / 10;
+        width: 100%;
+        max-height: 100%;
+        flex: none;
+        /* Respect aspect-ratio instead of flex grow */
+    }
+
+    /* Close button: inside top-right on mobile */
+    .viewer-close-btn {
+        right: 8px;
+        top: 8px;
+        width: 36px;
+        height: 36px;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    /* Compact controls */
+    .viewer-controls {
+        padding: 12px 0 0;
+        gap: 12px;
     }
 }
