@@ -415,6 +415,7 @@ async function preloadProjectSlides(project, category) {
 function renderSlide(index) {
     if (index < 0 || index >= showcaseSlides.length) return;
     showcaseCurrentSlide = index;
+    if (typeof resetZoom === 'function') resetZoom();
 
     const slide = showcaseSlides[index];
 
@@ -596,3 +597,226 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         }
     });
 });
+
+// ─── Zoom & Pan Module ────────────────────────────────────────
+
+(function () {
+    let zoomLevel = 1;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let startPanX = 0, startPanY = 0;
+
+    // Pinch state
+    let lastPinchDist = 0;
+    let pinchStartZoom = 1;
+
+    // Swipe state (mobile slide nav)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+
+    const MIN_ZOOM = 1;
+    const MAX_ZOOM = 5;
+    const ZOOM_STEP = 0.15;
+    const SWIPE_THRESHOLD = 50; // px
+
+    // ── Expose resetZoom globally so renderSlide can call it ──
+    window.resetZoom = function () {
+        zoomLevel = 1;
+        panX = 0;
+        panY = 0;
+        applyZoom();
+        slideDisplay.classList.remove('zoomed');
+    };
+
+    function applyZoom() {
+        const slide = slideDisplay.querySelector('.slide-visible');
+        if (!slide) return;
+        if (zoomLevel <= 1) {
+            slide.style.transform = 'scale(1)';
+            slideDisplay.classList.remove('zoomed');
+        } else {
+            slide.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
+            slideDisplay.classList.add('zoomed');
+        }
+    }
+
+    function clampPan() {
+        // Constrain pan so the image doesn't go too far off-screen
+        const maxPan = (zoomLevel - 1) / zoomLevel * 50; // % of half-size
+        const rect = slideDisplay.getBoundingClientRect();
+        const maxPanX = rect.width * (zoomLevel - 1) / (2 * zoomLevel);
+        const maxPanY = rect.height * (zoomLevel - 1) / (2 * zoomLevel);
+        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+        panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
+    }
+
+    // ── Mouse Wheel Zoom (PC) ──
+    slideDisplay.addEventListener('wheel', (e) => {
+        if (!overlay.classList.contains('active')) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+        const prevZoom = zoomLevel;
+        zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoomLevel + delta));
+
+        if (zoomLevel === MIN_ZOOM) {
+            panX = 0;
+            panY = 0;
+        } else {
+            // Adjust pan to keep zoom centered on cursor
+            const rect = slideDisplay.getBoundingClientRect();
+            const cursorX = (e.clientX - rect.left) / rect.width - 0.5;
+            const cursorY = (e.clientY - rect.top) / rect.height - 0.5;
+            const zoomDelta = zoomLevel - prevZoom;
+            panX -= cursorX * rect.width * zoomDelta / (zoomLevel * zoomLevel) * 0.5;
+            panY -= cursorY * rect.height * zoomDelta / (zoomLevel * zoomLevel) * 0.5;
+            clampPan();
+        }
+
+        applyZoom();
+    }, { passive: false });
+
+    // ── Mouse Drag Pan (PC) ──
+    slideDisplay.addEventListener('mousedown', (e) => {
+        if (zoomLevel <= 1) return;
+        e.preventDefault();
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        startPanX = panX;
+        startPanY = panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = (e.clientX - dragStartX) / zoomLevel;
+        const dy = (e.clientY - dragStartY) / zoomLevel;
+        panX = startPanX + dx;
+        panY = startPanY + dy;
+        clampPan();
+        applyZoom();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // ── Double-click to reset (PC) ──
+    slideDisplay.addEventListener('dblclick', (e) => {
+        if (!overlay.classList.contains('active')) return;
+        e.preventDefault();
+        resetZoom();
+    });
+
+    // ── Touch: Pinch Zoom + Pan + Swipe ──
+    slideDisplay.addEventListener('touchstart', (e) => {
+        if (!overlay.classList.contains('active')) return;
+
+        if (e.touches.length === 2) {
+            // Pinch start
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            lastPinchDist = Math.hypot(dx, dy);
+            pinchStartZoom = zoomLevel;
+            isSwiping = false;
+        } else if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+
+            if (zoomLevel > 1) {
+                // Pan start
+                e.preventDefault();
+                isDragging = true;
+                dragStartX = e.touches[0].clientX;
+                dragStartY = e.touches[0].clientY;
+                startPanX = panX;
+                startPanY = panY;
+                isSwiping = false;
+            } else {
+                // Potential swipe
+                isSwiping = true;
+            }
+        }
+    }, { passive: false });
+
+    slideDisplay.addEventListener('touchmove', (e) => {
+        if (!overlay.classList.contains('active')) return;
+
+        if (e.touches.length === 2) {
+            // Pinch zoom
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.hypot(dx, dy);
+            const scale = dist / lastPinchDist;
+            zoomLevel = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchStartZoom * scale));
+
+            if (zoomLevel === MIN_ZOOM) {
+                panX = 0;
+                panY = 0;
+            }
+            clampPan();
+            applyZoom();
+        } else if (e.touches.length === 1 && isDragging && zoomLevel > 1) {
+            // Touch pan
+            e.preventDefault();
+            const dx = (e.touches[0].clientX - dragStartX) / zoomLevel;
+            const dy = (e.touches[0].clientY - dragStartY) / zoomLevel;
+            panX = startPanX + dx;
+            panY = startPanY + dy;
+            clampPan();
+            applyZoom();
+        }
+    }, { passive: false });
+
+    slideDisplay.addEventListener('touchend', (e) => {
+        isDragging = false;
+
+        // Swipe detection (when not zoomed)
+        if (isSwiping && e.changedTouches.length === 1 && zoomLevel <= 1) {
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const diffX = endX - touchStartX;
+            const diffY = endY - touchStartY;
+
+            // Only count horizontal swipes
+            if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX < 0) {
+                    goToSlide(showcaseCurrentSlide + 1); // Swipe left → next
+                } else {
+                    goToSlide(showcaseCurrentSlide - 1); // Swipe right → prev
+                }
+            }
+        }
+        isSwiping = false;
+
+        // Snap back to 1× if zoomed very slightly
+        if (zoomLevel < 1.05) {
+            resetZoom();
+        }
+    });
+
+    // ── Double-tap to reset (mobile) ──
+    let lastTapTime = 0;
+    slideDisplay.addEventListener('touchend', (e) => {
+        if (e.touches.length > 0) return; // Ignore if fingers still down
+        const now = Date.now();
+        if (now - lastTapTime < 300) {
+            e.preventDefault();
+            if (zoomLevel > 1) {
+                resetZoom();
+            } else {
+                // Double-tap to zoom in to 2.5×
+                zoomLevel = 2.5;
+                panX = 0;
+                panY = 0;
+                applyZoom();
+            }
+        }
+        lastTapTime = now;
+    });
+})();
