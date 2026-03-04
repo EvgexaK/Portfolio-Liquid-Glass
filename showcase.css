@@ -270,8 +270,8 @@ body.showcase-active main {
     transform: scale(0.98);
     /* Start slightly smaller for entry effect */
     transition:
-        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
     pointer-events: none;
     /* Stale slides don't intercept interactions */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
