@@ -419,15 +419,16 @@ function renderSlide(index) {
 
     const slide = showcaseSlides[index];
 
-    // If this is an unrendered PDF page, show spinner and render it
+    // If this is an unrendered PDF page, keep current slide visible
+    // while rendering the new one silently in the background
     if (slide.type === 'pdf' && !slide.rendered) {
-        // Show a mini loading state
-        const loader = slideDisplay.querySelector('.slide-loading');
-        if (!loader) {
-            slideDisplay.insertAdjacentHTML('beforeend', '<div class="slide-loading"></div>');
-        }
+        // Update UI immediately so user sees feedback
+        updateIndicators();
+        updateCounter();
+        updateArrows();
+
         renderPDFPage(slide).then(() => {
-            // Only render if user hasn't navigated away
+            // Only transition if user hasn't navigated away
             if (showcaseCurrentSlide === index) {
                 renderSlideElement(slide, index);
             }
@@ -452,7 +453,7 @@ function renderSlideElement(slide, index) {
             el.classList.remove('slide-visible');
             setTimeout(() => {
                 if (el.parentNode === slideDisplay) el.remove();
-            }, 550);
+            }, 300);
         }
     });
 
@@ -468,7 +469,7 @@ function renderSlideElement(slide, index) {
     const loader = slideDisplay.querySelector('.slide-loading');
     if (loader) {
         loader.style.opacity = '0';
-        setTimeout(() => loader.remove(), 400);
+        setTimeout(() => loader.remove(), 200);
     }
 
     slideDisplay.appendChild(slide.element);
@@ -493,8 +494,31 @@ function renderSlideElement(slide, index) {
  */
 async function preRenderAllPages() {
     const loadId = currentLoadId; // Snapshot to detect stale renders
-    for (let i = 0; i < showcaseSlides.length; i++) {
-        // Bail if user switched to a different project
+    const BATCH = 3; // Render 3 pages in parallel for speed
+    for (let i = 0; i < showcaseSlides.length; i += BATCH) {
+        if (currentLoadId !== loadId) return;
+        const batch = [];
+        for (let j = i; j < Math.min(i + BATCH, showcaseSlides.length); j++) {
+            const s = showcaseSlides[j];
+            if (s.type === 'pdf' && !s.rendered) {
+                batch.push(renderPDFPage(s));
+            }
+        }
+        if (batch.length > 0) await Promise.all(batch);
+    }
+}
+
+/**
+ * Pre-renders ±2 adjacent PDF pages around the current index.
+ * Called after navigating to a lazy-rendered page so the next
+ * slides the user visits are already ready.
+ */
+async function preRenderAdjacent(index) {
+    const loadId = currentLoadId;
+    const offsets = [-2, -1, 1, 2];
+    for (const offset of offsets) {
+        const i = index + offset;
+        if (i < 0 || i >= showcaseSlides.length) continue;
         if (currentLoadId !== loadId) return;
         const s = showcaseSlides[i];
         if (s.type === 'pdf' && !s.rendered) {
@@ -507,6 +531,7 @@ async function preRenderAllPages() {
 
 function goToSlide(index) {
     if (index < 0 || index >= showcaseSlides.length) return;
+    if (index === showcaseCurrentSlide) return; // Already on this slide
     renderSlide(index);
 }
 
