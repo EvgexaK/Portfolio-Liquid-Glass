@@ -16,7 +16,7 @@ Object.entries(categories).forEach(([key, folderName]) => {
             if (fs.statSync(itemPath).isDirectory()) {
                 const files = fs.readdirSync(itemPath, { encoding: 'utf8' }).filter(f => {
                     const ext = path.extname(f).toLowerCase();
-                    return ['.jpg', '.jpeg', '.png', '.webp', '.pdf'].includes(ext);
+                    return ['.jpg', '.jpeg', '.png', '.webp', '.pdf', '.mp4', '.webm'].includes(ext);
                 }).sort();
 
                 if (files.length > 0) {

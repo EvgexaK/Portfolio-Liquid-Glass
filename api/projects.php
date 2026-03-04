@@ -34,7 +34,7 @@ foreach ($folders as $folder) {
         
         foreach ($files as $file) {
             $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'])) {
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'mp4', 'webm'])) {
                 $validFiles[] = $file;
             }
         }

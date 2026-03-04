@@ -256,6 +256,7 @@ body.showcase-active main {
 
 .slide-display img,
 .slide-display canvas,
+.slide-display video,
 .slide-display>.slide-item {
     position: absolute;
     /* Cross-fade overlap */
@@ -279,6 +280,7 @@ body.showcase-active main {
 
 .slide-display img.slide-visible,
 .slide-display canvas.slide-visible,
+.slide-display video.slide-visible,
 .slide-display .slide-item.slide-visible {
     opacity: 1;
     transform: scale(1);
