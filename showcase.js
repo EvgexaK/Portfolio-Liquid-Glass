@@ -308,6 +308,15 @@ async function loadSlides(project, category) {
                     renderIndicators();
                     updateCounter();
                 }
+            } else if (['mp4', 'webm'].includes(ext)) {
+                showcaseSlides.push({ type: 'video', src: fileUrl, element: null, rendered: true });
+
+                if (!firstSlideShown && showcaseSlides.length === 1) {
+                    firstSlideShown = true;
+                    renderSlide(0);
+                    renderIndicators();
+                    updateCounter();
+                }
             }
         }
         // Save to cache for future clicks
@@ -407,6 +416,8 @@ async function preloadProjectSlides(project, category) {
             }
         } else if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
             tempSlides.push({ type: 'img', src: fileUrl, element: null, rendered: true });
+        } else if (['mp4', 'webm'].includes(ext)) {
+            tempSlides.push({ type: 'video', src: fileUrl, element: null, rendered: true });
         }
     }
     showcasePreloadedSlides[cacheKey] = tempSlides;
@@ -450,11 +461,15 @@ function renderSlide(index) {
  * Actually puts the slide element into the DOM with transitions.
  */
 function renderSlideElement(slide, index) {
-    // Remove active state from current slide
+    // Remove active state from current slide, pause any videos
     const existing = slideDisplay.querySelectorAll('.slide-item');
     existing.forEach(el => {
         if (el.classList.contains('slide-visible')) {
             el.classList.remove('slide-visible');
+            if (el.tagName === 'VIDEO') {
+                el.pause();
+                el.currentTime = 0;
+            }
             setTimeout(() => {
                 if (el.parentNode === slideDisplay) el.remove();
             }, 300);
@@ -462,12 +477,29 @@ function renderSlideElement(slide, index) {
     });
 
     if (!slide.element) {
-        const img = document.createElement('img');
-        img.src = slide.src;
-        img.className = 'slide-item';
-        img.alt = `Slide ${index + 1}`;
-        img.draggable = false;
-        slide.element = img;
+        if (slide.type === 'video') {
+            const video = document.createElement('video');
+            video.src = slide.src;
+            video.className = 'slide-item';
+            video.autoplay = true;
+            video.loop = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.draggable = false;
+            video.preload = 'auto';
+            slide.element = video;
+        } else {
+            const img = document.createElement('img');
+            img.src = slide.src;
+            img.className = 'slide-item';
+            img.alt = `Slide ${index + 1}`;
+            img.draggable = false;
+            slide.element = img;
+        }
+    } else if (slide.type === 'video') {
+        // Re-entering a cached video slide — restart playback
+        slide.element.currentTime = 0;
+        slide.element.play().catch(() => { });
     }
 
     const loader = slideDisplay.querySelector('.slide-loading');
