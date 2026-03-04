@@ -120,10 +120,14 @@ async function loadProjects(category) {
     projectList.innerHTML = '<div class="project-list-empty">Loading projects...</div>';
 
     try {
-        const resp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
-        if (!resp.ok) throw new Error('Failed to load projects JSON');
-        const data = await resp.json();
-        showcaseProjects = data[category] || [];
+        // Use preloaded data if available, otherwise fetch live from PHP
+        if (showcasePreloadedData[category]) {
+            showcaseProjects = showcasePreloadedData[category];
+        } else {
+            const resp = await fetch(`api/projects.php?category=${category}&t=${Date.now()}`);
+            if (!resp.ok) throw new Error('Failed to load projects');
+            showcaseProjects = await resp.json();
+        }
     } catch (e) {
         console.warn('Failed to load projects:', e);
         showcaseProjects = [];
@@ -597,15 +601,18 @@ let showcasePreloadedData = {};
  * Pre-load project list JSON in background for browser cache
  */
 async function preloadShowcase() {
-    try {
-        const resp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
-        if (resp.ok) {
-            showcasePreloadedData = await resp.json();
-            console.log('Preloaded projects list.');
+    const categories = ['3d', 'design', 'it'];
+    for (const cat of categories) {
+        try {
+            const resp = await fetch(`api/projects.php?category=${cat}`);
+            if (resp.ok) {
+                showcasePreloadedData[cat] = await resp.json();
+            }
+        } catch (e) {
+            // Ignore pre-loading errors
         }
-    } catch (e) {
-        // Ignore pre-loading errors
     }
+    console.log('Preloaded projects list.');
 }
 
 // Global initialization - run pre-loader when page is ready
