@@ -4,7 +4,7 @@ import os, json
 
 BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Projects')
 CATS = {'3d': '3D', 'design': 'Design', 'it': 'IT'}
-EXTS = {'.jpg', '.jpeg', '.png', '.webp', '.pdf'}
+EXTS = {'.jpg', '.jpeg', '.png', '.webp', '.pdf', '.mp4', '.webm'}
 data = {}
 
 for key, folder in CATS.items():
