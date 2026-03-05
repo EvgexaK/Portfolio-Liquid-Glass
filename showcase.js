@@ -120,13 +120,29 @@ async function loadProjects(category) {
     projectList.innerHTML = '<div class="project-list-empty">Loading projects...</div>';
 
     try {
-        // Use preloaded data if available, otherwise fetch live from PHP
+        // Use preloaded data if available
         if (showcasePreloadedData[category]) {
             showcaseProjects = showcasePreloadedData[category];
         } else {
-            const resp = await fetch(`api/projects.php?category=${category}&t=${Date.now()}`);
-            if (!resp.ok) throw new Error('Failed to load projects');
-            showcaseProjects = await resp.json();
+            // Try live PHP API first (production), fall back to static JSON (local dev)
+            let data = null;
+            try {
+                const resp = await fetch(`api/projects.php?category=${category}&t=${Date.now()}`);
+                const ct = resp.headers.get('content-type') || '';
+                if (resp.ok && ct.includes('application/json')) {
+                    data = await resp.json();
+                }
+            } catch (_) { /* PHP not available */ }
+
+            if (!data) {
+                // Fallback: load from static JSON
+                const resp2 = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
+                if (resp2.ok) {
+                    const all = await resp2.json();
+                    data = all[category] || [];
+                }
+            }
+            showcaseProjects = data || [];
         }
     } catch (e) {
         console.warn('Failed to load projects:', e);
@@ -254,7 +270,14 @@ async function loadSlides(project, category) {
         const folderName = folderMap[category] || '3D';
         const basePath = `Projects/${folderName}/${project.folder}/`;
 
-        for (const file of project.files) {
+        // Sort files by numerical prefix (e.g., "1 file.jpg" comes before "2 file.mp4")
+        const sortedFiles = [...project.files].sort((a, b) => {
+            const numA = parseInt(a.match(/^\d+/)) || 9999;
+            const numB = parseInt(b.match(/^\d+/)) || 9999;
+            return numA - numB;
+        });
+
+        for (const file of sortedFiles) {
             if (currentLoadId !== myLoadId) return;
             const ext = file.split('.').pop().toLowerCase();
             const fileUrl = basePath + encodeURIComponent(file);
@@ -361,13 +384,15 @@ async function renderPDFPage(slide) {
     if (slide.rendered || slide.type !== 'pdf') return;
     try {
         const page = await slide.pdfDoc.getPage(slide.pageNum);
-        const scale = 1.5;
+        const MAX_DIM = 2048; // Cap at 2K to keep transitions snappy
+        const native = page.getViewport({ scale: 1 });
+        const scale = Math.min(1.5, MAX_DIM / Math.max(native.width, native.height));
         const viewport = page.getViewport({ scale });
         const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        slide.src = canvas.toDataURL('image/jpeg', 0.90);
+        slide.src = canvas.toDataURL('image/jpeg', 0.85);
         slide.rendered = true;
     } catch (err) {
         console.error('Error rendering PDF page:', err);
@@ -389,7 +414,14 @@ async function preloadProjectSlides(project, category) {
     const basePath = `Projects/${folderName}/${project.folder}/`;
     const tempSlides = [];
 
-    for (const file of project.files) {
+    // Sort files by numerical prefix (e.g., "1 file.jpg" comes before "2 file.mp4")
+    const sortedFiles = [...project.files].sort((a, b) => {
+        const numA = parseInt(a.match(/^\d+/)) || 9999;
+        const numB = parseInt(b.match(/^\d+/)) || 9999;
+        return numA - numB;
+    });
+
+    for (const file of sortedFiles) {
         const ext = file.split('.').pop().toLowerCase();
         const fileUrl = basePath + encodeURIComponent(file);
 
@@ -634,17 +666,34 @@ let showcasePreloadedData = {};
  */
 async function preloadShowcase() {
     const categories = ['3d', 'design', 'it'];
+    let usedPhp = false;
+
+    // Try PHP API first (production)
     for (const cat of categories) {
         try {
             const resp = await fetch(`api/projects.php?category=${cat}`);
-            if (resp.ok) {
+            const ct = resp.headers.get('content-type') || '';
+            if (resp.ok && ct.includes('application/json')) {
                 showcasePreloadedData[cat] = await resp.json();
+                usedPhp = true;
             }
-        } catch (e) {
-            // Ignore pre-loading errors
-        }
+        } catch (e) { /* PHP not available */ }
     }
-    console.log('Preloaded projects list.');
+
+    // Fallback to static JSON (local dev without PHP)
+    if (!usedPhp) {
+        try {
+            const resp = await fetch(`api/projects-fallback.json?t=${Date.now()}`);
+            if (resp.ok) {
+                const all = await resp.json();
+                for (const cat of categories) {
+                    showcasePreloadedData[cat] = all[cat] || [];
+                }
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    console.log(`Preloaded projects list (${usedPhp ? 'PHP API' : 'static JSON'}).`);
 }
 
 // Global initialization - run pre-loader when page is ready
@@ -679,6 +728,12 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     let touchStartX = 0;
     let touchStartY = 0;
     let isSwiping = false;
+
+    // Video Scrubbing state
+    let isVideoScrubbing = false;
+    let videoScrubStartX = 0;
+    let videoStartOriginTime = 0;
+    let scrubbedVideo = null;
 
     const MIN_ZOOM = 1;
     const MAX_ZOOM = 5;
@@ -743,9 +798,21 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         applyZoom();
     }, { passive: false });
 
-    // ── Mouse Drag Pan (PC) ──
+    // ── Mouse Drag Pan & Scrubbing (PC) ──
     slideDisplay.addEventListener('mousedown', (e) => {
-        if (zoomLevel <= 1) return;
+        if (zoomLevel <= 1) {
+            // Check if we are clicking on a video for scrubbing
+            const slide = slideDisplay.querySelector('.slide-visible');
+            if (slide && slide.tagName === 'VIDEO') {
+                e.preventDefault();
+                isVideoScrubbing = true;
+                videoScrubStartX = e.clientX;
+                videoStartOriginTime = slide.currentTime;
+                scrubbedVideo = slide;
+                slide.pause(); // Pause while scrubbing
+            }
+            return;
+        }
         e.preventDefault();
         isDragging = true;
         dragStartX = e.clientX;
@@ -755,6 +822,25 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     });
 
     window.addEventListener('mousemove', (e) => {
+        if (isVideoScrubbing && scrubbedVideo) {
+            e.preventDefault();
+            const dx = e.clientX - videoScrubStartX;
+            // 1 full window width drag = 1 full rotation (video duration)
+            const duration = scrubbedVideo.duration || 1;
+            const timeDelta = (dx / window.innerWidth) * duration;
+            let newTime = videoStartOriginTime + timeDelta;
+
+            // Loop the video wrapping
+            if (newTime < 0) {
+                newTime = duration + (newTime % duration);
+            } else if (newTime > duration) {
+                newTime = newTime % duration;
+            }
+
+            scrubbedVideo.currentTime = newTime;
+            return;
+        }
+
         if (!isDragging) return;
         const dx = (e.clientX - dragStartX) / zoomLevel;
         const dy = (e.clientY - dragStartY) / zoomLevel;
@@ -766,6 +852,10 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 
     window.addEventListener('mouseup', () => {
         isDragging = false;
+        if (isVideoScrubbing && scrubbedVideo) {
+            isVideoScrubbing = false;
+            scrubbedVideo = null;
+        }
     });
 
     // ── Double-click to reset (PC) ──
@@ -775,7 +865,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
         resetZoom();
     });
 
-    // ── Touch: Pinch Zoom + Pan + Swipe ──
+    // ── Touch: Pinch Zoom + Pan + Swipe + Scrub ──
     slideDisplay.addEventListener('touchstart', (e) => {
         if (!overlay.classList.contains('active')) return;
 
@@ -787,6 +877,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
             lastPinchDist = Math.hypot(dx, dy);
             pinchStartZoom = zoomLevel;
             isSwiping = false;
+            isVideoScrubbing = false;
         } else if (e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
@@ -800,9 +891,22 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
                 startPanX = panX;
                 startPanY = panY;
                 isSwiping = false;
+                isVideoScrubbing = false;
             } else {
-                // Potential swipe
-                isSwiping = true;
+                // Potential swipe or scrub
+                const slide = slideDisplay.querySelector('.slide-visible');
+                if (slide && slide.tagName === 'VIDEO') {
+                    // Start scrub instead of swipe
+                    isVideoScrubbing = true;
+                    videoScrubStartX = e.touches[0].clientX;
+                    videoStartOriginTime = slide.currentTime;
+                    scrubbedVideo = slide;
+                    slide.pause(); // Pause while scrubbing
+                    isSwiping = false; // Disable swipe
+                } else {
+                    isSwiping = true;
+                    isVideoScrubbing = false;
+                }
             }
         }
     }, { passive: false });
@@ -825,20 +929,45 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
             }
             clampPan();
             applyZoom();
-        } else if (e.touches.length === 1 && isDragging && zoomLevel > 1) {
-            // Touch pan
-            e.preventDefault();
-            const dx = (e.touches[0].clientX - dragStartX) / zoomLevel;
-            const dy = (e.touches[0].clientY - dragStartY) / zoomLevel;
-            panX = startPanX + dx;
-            panY = startPanY + dy;
-            clampPan();
-            applyZoom();
+        } else if (e.touches.length === 1) {
+            if (isVideoScrubbing && scrubbedVideo) {
+                // Prevent scrolling while scrubbing
+                e.preventDefault();
+                const dx = e.touches[0].clientX - videoScrubStartX;
+                const duration = scrubbedVideo.duration || 1;
+                // Double sensitivity for touch feels better
+                const timeDelta = (dx / window.innerWidth) * duration * 1.5;
+                let newTime = videoStartOriginTime + timeDelta;
+
+                if (newTime < 0) {
+                    newTime = duration + (newTime % duration);
+                } else if (newTime > duration) {
+                    newTime = newTime % duration;
+                }
+
+                scrubbedVideo.currentTime = newTime;
+            } else if (isDragging && zoomLevel > 1) {
+                // Touch pan
+                e.preventDefault();
+                const dx = (e.touches[0].clientX - dragStartX) / zoomLevel;
+                const dy = (e.touches[0].clientY - dragStartY) / zoomLevel;
+                panX = startPanX + dx;
+                panY = startPanY + dy;
+                clampPan();
+                applyZoom();
+            }
         }
     }, { passive: false });
 
     slideDisplay.addEventListener('touchend', (e) => {
         isDragging = false;
+
+        if (isVideoScrubbing && scrubbedVideo) {
+            isVideoScrubbing = false;
+            scrubbedVideo = null;
+            // Prevent swipe logic from triggering
+            isSwiping = false;
+        }
 
         // Swipe detection (when not zoomed)
         if (isSwiping && e.changedTouches.length === 1 && zoomLevel <= 1) {
