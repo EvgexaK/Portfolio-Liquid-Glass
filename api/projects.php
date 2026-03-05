@@ -39,8 +39,17 @@ foreach ($folders as $folder) {
             }
         }
         
-        // Sort files so they appear in consistent order
-        sort($validFiles);
+        // Sort files by numerical prefix (e.g., "1 file.jpg" comes before "2 file.mp4")
+        usort($validFiles, function($a, $b) {
+            preg_match('/^\d+/', $a, $matchesA);
+            preg_match('/^\d+/', $b, $matchesB);
+            
+            $numA = isset($matchesA[0]) ? intval($matchesA[0]) : 9999;
+            $numB = isset($matchesB[0]) ? intval($matchesB[0]) : 9999;
+            
+            if ($numA !== $numB) return $numA - $numB;
+            return strcasecmp($a, $b);
+        });
         
         if (!empty($validFiles)) {
             $projects[] = [
