@@ -50,6 +50,13 @@ jobs:
                 exit 1
             fi
             
+            # 2.5 Sync Git-tracked Projects to Persistent Storage
+            if [ -d "/tmp/portfolio_clone/Projects" ]; then
+                mkdir -p /srv/portfolio-projects
+                cp -r /tmp/portfolio_clone/Projects/* /srv/portfolio-projects/ 2>/dev/null || true
+                rm -rf /tmp/portfolio_clone/Projects
+            fi
+
             # 3. Clean and Populate /var/www/html (Careful with existing symlinks)
             # Remove all tracked files but LEAVE the Projects symlink if it exists
             find /var/www/html -maxdepth 1 -mindepth 1 ! -name 'Projects' -exec rm -rf {} +
