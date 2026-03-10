@@ -170,7 +170,7 @@ body.showcase-active main {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: calc(85vh * 16 / 9); /* Lock max width to 16:9 of max height to prevent overflow */
+    max-width: calc(70vh * 16 / 9); /* Lock max width to 16:9 of max height to prevent overflow (70vh gives good padding) */
     position: relative;
     /* Anchor for close button */
 }
