@@ -36,9 +36,9 @@ jobs:
             # Force fetch and reset
             git fetch --all
             git reset --hard origin/master
-            git clean -fd
+            # NOTE: git clean -fd is REMOVED to prevent wiping untracked files like Projects symlinks
 
-            # DEPLOYMENT REPAIR 1.4
+            # DEPLOYMENT REPAIR 1.5 - With Persistent Projects
             
             # 1. Create a safe temp directory for valid clone
             rm -rf /tmp/portfolio_clone
@@ -50,32 +50,38 @@ jobs:
                 exit 1
             fi
             
-            # 3. Clean and Populate /var/www/html
-            rm -rf /var/www/html/*
+            # 3. Clean and Populate /var/www/html (Careful with existing symlinks)
+            # Remove all tracked files but LEAVE the Projects symlink if it exists
+            find /var/www/html -maxdepth 1 -mindepth 1 ! -name 'Projects' -exec rm -rf {} +
             cp -r /tmp/portfolio_clone/* /var/www/html/
             
             # 4. Create Debug Files
-            echo "VERSION 1.4 - REPAIRED $(date)" > /var/www/html/version.txt
+            echo "VERSION 1.5 - PERSISTENT PROJECTS $(date)" > /var/www/html/version.txt
             ls -la /var/www/html/ > /var/www/html/filelist.txt
             
             # 5. Bruteforce Permissions (Common 403 fix)
-            # Dirs: 755, Files: 644
             find /var/www/html -type d -exec chmod 755 {} \;
             find /var/www/html -type f -exec chmod 644 {} \;
-            chown -R www-data:www-data /var/www/html
             
             # 6. Copy to alternate root just in case
             mkdir -p /var/www/zhdanov.design
+            find /var/www/zhdanov.design -maxdepth 1 -mindepth 1 ! -name 'Projects' -exec rm -rf {} +
             cp -r /var/www/html/* /var/www/zhdanov.design/
-            chown -R www-data:www-data /var/www/zhdanov.design
             
             # 7. Copy to Mail-in-a-Box managed web roots (MIAB serves from these)
             mkdir -p /home/user-data/www/default
             mkdir -p /home/user-data/www/zhdanov.design
+            find /home/user-data/www/default -maxdepth 1 -mindepth 1 ! -name 'Projects' -exec rm -rf {} +
+            find /home/user-data/www/zhdanov.design -maxdepth 1 -mindepth 1 ! -name 'Projects' -exec rm -rf {} +
             cp -r /var/www/html/* /home/user-data/www/default/
             cp -r /var/www/html/* /home/user-data/www/zhdanov.design/
-            chown -R www-data:www-data /home/user-data/www/default
-            chown -R www-data:www-data /home/user-data/www/zhdanov.design
+
+            # 8. Ensure Projects is symlinked correctly in ALL roots to the persistent storage
+            for DIR in /var/www/html /var/www/zhdanov.design /home/user-data/www/default /home/user-data/www/zhdanov.design; do
+                rm -rf $DIR/Projects
+                ln -sfn /srv/portfolio-projects $DIR/Projects
+                chown -R www-data:www-data $DIR
+            done
             
-            # 8. Reload
+            # 9. Reload Nginx
             systemctl reload nginx
