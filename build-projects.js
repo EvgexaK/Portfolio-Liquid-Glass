@@ -14,10 +14,17 @@ Object.entries(categories).forEach(([key, folderName]) => {
         for (const item of items) {
             const itemPath = path.join(targetDir, item);
             if (fs.statSync(itemPath).isDirectory()) {
-                const files = fs.readdirSync(itemPath, { encoding: 'utf8' }).filter(f => {
+                let files = fs.readdirSync(itemPath, { encoding: 'utf8' }).filter(f => {
                     const ext = path.extname(f).toLowerCase();
                     return ['.jpg', '.jpeg', '.png', '.webp', '.pdf', '.mp4', '.webm'].includes(ext);
-                }).sort();
+                });
+
+                // Sort slides by number prefix if available
+                files.sort((a, b) => {
+                    const numA = parseInt(a.match(/^\d+/)) || 9999;
+                    const numB = parseInt(b.match(/^\d+/)) || 9999;
+                    return numA - numB || a.localeCompare(b);
+                });
 
                 if (files.length > 0) {
                     projects.push({ folder: item, files });

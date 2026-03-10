@@ -40,6 +40,12 @@ function openShowcase(category, event) {
     // Update UI title
     showcaseTitle.textContent = categoryTitles[category] || 'Showcase';
 
+    // Show disclaimer only for design works
+    const disclaimer = document.getElementById('design-disclaimer');
+    if (disclaimer) {
+        disclaimer.style.display = category === 'design' ? 'block' : 'none';
+    }
+
     // Dispatch custom event to tell shader to change colors
     const themeIndexMap = { '3d': 4, 'design': 5, 'it': 6 }; // We'll add these to shader-bg.js
     window.dispatchEvent(new CustomEvent('set-theme', {

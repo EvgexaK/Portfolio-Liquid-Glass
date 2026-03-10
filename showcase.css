@@ -143,6 +143,17 @@ body.showcase-active main {
     line-height: 1.6;
 }
 
+.design-disclaimer {
+    margin-top: auto;
+    padding: 24px 18px 0;
+    font-family: var(--font-primary);
+    font-size: 0.65rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: left;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* ── Right Panel: Slide Viewer ─────────────────────────────── */
 .viewer-panel {
     flex: 1;

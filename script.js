@@ -83,7 +83,8 @@ function initLanguageSwitcher() {
             "nav.contact": "Contact",
             "hero.name": "Evgenii Zhdanov",
             "project.восточный рудник календарь": "Vostochny Mine Calendar",
-            "project.руководство по оформлению": "Design Guidelines"
+            "project.руководство по оформлению": "Design Guidelines",
+            "showcase.design.disclaimer": "All logos, photos, and trademarks displayed are the property of their respective owners. These works are presented for portfolio purposes only to demonstrate design capabilities and professional experience."
         },
         ru: {
             "hero.line1": "Цифровой",
@@ -149,7 +150,8 @@ function initLanguageSwitcher() {
             "nav.contact": "Контакты",
             "hero.name": "Евгений Жданов",
             "project.восточный рудник календарь": "Восточный рудник календарь",
-            "project.руководство по оформлению": "Руководство по оформлению"
+            "project.руководство по оформлению": "Руководство по оформлению",
+            "showcase.design.disclaimer": "Все представленные в портфолио логотипы, фотографии и товарные знаки являются собственностью их законных владельцев. Данные работы демонстрируются исключительно в целях визуализации профессионального опыта и дизайна. Все права на брендинг принадлежат соответствующим правообладателям."
         }
     };
 
