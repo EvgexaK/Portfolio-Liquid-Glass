@@ -170,9 +170,7 @@ body.showcase-active main {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 1200px;
-    height: 80vh;
-    /* Reduced height to make it smaller overall */
+    max-width: calc(85vh * 16 / 9); /* Lock max width to 16:9 of max height to prevent overflow */
     position: relative;
     /* Anchor for close button */
 }
@@ -180,8 +178,7 @@ body.showcase-active main {
 .viewer-container {
     position: relative;
     width: 100%;
-    flex: 1;
-    /* Takes up remaining height above controls */
+    aspect-ratio: 16 / 9;
     border-radius: 20px;
     /* overflow: hidden clips zoomed content to rounded corners (close btn is in .viewer-wrapper, not here) */
     overflow: hidden;
@@ -271,13 +268,10 @@ body.showcase-active main {
 .slide-display>.slide-item {
     position: absolute;
     /* Cross-fade overlap */
-    max-width: 95%;
-    /* Margin from edges */
-    max-height: 95%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    border-radius: 8px;
+    border-radius: 20px;
     opacity: 0;
     transform: scale(0.98);
     /* Start slightly smaller for entry effect */
