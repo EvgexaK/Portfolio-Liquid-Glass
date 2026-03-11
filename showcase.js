@@ -159,18 +159,21 @@ async function loadProjects(category) {
 }
 
 function getTranslatedProjectName(folderName) {
+    // Strip leading sorting numbers, spaces, and hyphens (e.g. "01 Muffin" -> "Muffin")
+    const cleanName = folderName.replace(/^\d+[\s-]?/, '').trim();
+
     // Check global scope (set by script.js)
     const lang = window.currentAppLanguage || 'en';
     // Access global translations
     if (window.translations && window.translations[lang]) {
-        // We look for key "project.foldername_in_lowercase"
-        const key = 'project.' + folderName.toLowerCase();
+        // We look for key "project.clean_name_in_lowercase"
+        const key = 'project.' + cleanName.toLowerCase();
         if (window.translations[lang][key]) {
             return window.translations[lang][key];
         }
     }
-    // Fallback to exactly what the folder is named
-    return folderName;
+    // Fallback to exactly what the clean folder name is
+    return cleanName;
 }
 
 async function renderProjectList(category) {
