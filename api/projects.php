@@ -60,9 +60,18 @@ foreach ($folders as $folder) {
     }
 }
 
-// Optional: Sort projects alphabetically by folder name
+// Sort projects in inverse order (highest number prefix first)
 usort($projects, function ($a, $b) {
-    return strcmp($a['folder'], $b['folder']);
+    preg_match('/^\d+/', $a['folder'], $matchesA);
+    preg_match('/^\d+/', $b['folder'], $matchesB);
+    
+    $numA = isset($matchesA[0]) ? intval($matchesA[0]) : -1;
+    $numB = isset($matchesB[0]) ? intval($matchesB[0]) : -1;
+    
+    if ($numA !== $numB) {
+        return $numB - $numA;
+    }
+    return strcasecmp($a['folder'], $b['folder']);
 });
 
 echo json_encode($projects, JSON_UNESCAPED_UNICODE);
