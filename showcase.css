@@ -506,4 +506,17 @@ body.showcase-active main {
         padding: 12px 0 0;
         gap: 12px;
     }
+
+    .showcase-overlay.gallery-mode .viewer-panel {
+        padding-left: 8px;
+    }
+}
+
+/* ── Gallery Mode Overrides ───────────────────────────────── */
+.showcase-overlay.gallery-mode .project-panel {
+    display: none;
+}
+
+.showcase-overlay.gallery-mode .viewer-panel {
+    padding-left: 80px;
 }

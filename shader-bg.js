@@ -212,8 +212,8 @@
     ['#000000', '#020408', '#050a12', '#f59e0b', '#8b5cf6', '#ec4899', '#000000'].map(hexToGL),
     // 2: About — teal/green shift
     ['#000000', '#020408', '#050a12', '#14b8a6', '#0ea5e9', '#8b5cf6', '#000000'].map(hexToGL),
-    // 3: Contact — purple/gold
-    ['#000000', '#020408', '#050a12', '#a855f7', '#eab308', '#ec4899', '#000000'].map(hexToGL),
+    // 3: Contact — purple/green
+    ['#000000', '#020408', '#050a12', '#a855f7', '#10b981', '#ec4899', '#000000'].map(hexToGL),
     // 4: 3D Showcase Overlay
     ['#000000', '#020408', '#050a12', '#f59e0b', '#f97316', '#dc2626', '#000000'].map(hexToGL),
     // 5: Design Showcase Overlay
@@ -315,6 +315,7 @@
   let targetColors = themes[0].map(c => [...c]);
   let currentOffset = 0.0;
   let targetOffset = 0.0;
+  let currentScrollRaw = 0.0;
 
   function setThemeColors(index) {
     const theme = themes[index] || themes[0];
@@ -379,20 +380,24 @@
     // Smoothly interpolate colors
     for (let i = 0; i < currentColors.length; i++) {
       for (let j = 0; j < 4; j++) {
-        currentColors[i][j] += (targetColors[i][j] - currentColors[i][j]) * 0.02;
+        currentColors[i][j] += (targetColors[i][j] - currentColors[i][j]) * 0.01;
       }
     }
 
 
     // Smoothly interpolate offset
-    currentOffset += (targetOffset - currentOffset) * 0.025;
+    currentOffset += (targetOffset - currentOffset) * 0.01;
+
+    // Smoothly interpolate scroll
+    const targetScrollRaw = window.liquidScrollY || window.scrollY || 0;
+    currentScrollRaw += (targetScrollRaw - currentScrollRaw) * 0.01;
 
     // Update uniforms
     gl.uniform1f(uTime, elapsed * speed);
     gl.uniform2f(uResolution, canvas.width, canvas.height);
     gl.uniform2f(uMouse, mouseX + 0.5, mouseY + 0.5); // Offset by +0.5 to match the shader's uv += 0.5 logic
     gl.uniform1f(uOffset, currentOffset);
-    gl.uniform1f(uScroll, window.liquidScrollY || window.scrollY || 0); // Pass smoothed scroll
+    gl.uniform1f(uScroll, currentScrollRaw); // Pass smoothed scroll
     gl.uniform1f(uColorsCount, currentColors.length);
 
     for (let i = 0; i < MAX_COLORS; i++) {

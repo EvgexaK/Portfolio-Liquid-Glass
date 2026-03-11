@@ -76,8 +76,53 @@ function openShowcase(category, event) {
     loadProjects(category);
 }
 
+// ─── Open Gallery Mode (No Sidebar) ──────────────────────────
+function openGallery(images, startIndex, title) {
+    currentCategory = null;
+    showcaseActiveProject = null;
+    showcaseSlides = [];
+    showcaseCurrentSlide = startIndex || 0;
+
+    showcaseTitle.textContent = title || 'Gallery';
+    const disclaimer = document.getElementById('design-disclaimer');
+    if (disclaimer) disclaimer.style.display = 'none';
+
+    images.forEach(imgUrl => {
+        showcaseSlides.push({ type: 'img', src: imgUrl, element: null, rendered: true });
+    });
+
+    slideDisplay.innerHTML = '';
+    viewerEmpty.style.display = 'none';
+    viewerSlides.style.display = 'flex';
+    if (viewerControls) viewerControls.style.display = 'flex';
+
+    renderSlide(showcaseCurrentSlide);
+    renderIndicators();
+    updateCounter();
+    updateArrows();
+
+    overlay.classList.add('active');
+    overlay.classList.add('gallery-mode');
+    document.body.classList.add('showcase-active');
+    document.querySelector('.liquid-glass-nav').classList.add('nav-top-mode');
+    
+    // Trigger indicator update after layout shift starts
+    setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
+    setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 600);
+}
+
 function closeShowcase() {
     overlay.classList.remove('active');
+    
+    // Only revert shader to 'Works' if we weren't in gallery mode
+    if (!overlay.classList.contains('gallery-mode')) {
+        // Tell shader to revert to current section (Works = 1 format)
+        window.dispatchEvent(new CustomEvent('set-theme', {
+            detail: { index: 1 } // Return to 'Works' theme
+        }));
+    }
+
+    overlay.classList.remove('gallery-mode');
     document.body.classList.remove('showcase-active');
     document.querySelector('.liquid-glass-nav').classList.remove('nav-top-mode');
 
@@ -94,11 +139,6 @@ function closeShowcase() {
     Object.values(showcasePreloadedSlides).forEach(slides => {
         slides.forEach(s => { s.element = null; });
     });
-
-    // Tell shader to revert to current section (Works = 1 format)
-    window.dispatchEvent(new CustomEvent('set-theme', {
-        detail: { index: 1 } // Return to 'Works' theme
-    }));
 
     // Trigger indicator update so it snaps back to bottom menu position
     setTimeout(() => {
