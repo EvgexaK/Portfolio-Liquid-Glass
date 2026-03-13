@@ -105,7 +105,7 @@ function openGallery(images, startIndex, title) {
     overlay.classList.add('gallery-mode');
     document.body.classList.add('showcase-active');
     document.querySelector('.liquid-glass-nav').classList.add('nav-top-mode');
-    
+
     // Trigger indicator update after layout shift starts
     setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
     setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 600);
@@ -113,7 +113,7 @@ function openGallery(images, startIndex, title) {
 
 function closeShowcase() {
     overlay.classList.remove('active');
-    
+
     // Only revert shader to 'Works' if we weren't in gallery mode
     if (!overlay.classList.contains('gallery-mode')) {
         // Tell shader to revert to current section (Works = 1 format)
@@ -685,7 +685,11 @@ function renderIndicators() {
 
 function updateIndicators() {
     slideIndicators.querySelectorAll('.slide-dot').forEach((dot, i) => {
-        dot.classList.toggle('active', i === showcaseCurrentSlide);
+        const isActive = i === showcaseCurrentSlide;
+        dot.classList.toggle('active', isActive);
+        if (isActive) {
+            dot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
     });
 }
 

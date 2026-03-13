@@ -170,7 +170,8 @@ body.showcase-active main {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: calc(70vh * 16 / 9); /* Lock max width to 16:9 of max height to prevent overflow (70vh gives good padding) */
+    max-width: calc(70vh * 16 / 9);
+    /* Lock max width to 16:9 of max height to prevent overflow (70vh gives good padding) */
     position: relative;
     /* Anchor for close button */
 }
@@ -376,9 +377,11 @@ body.showcase-active main {
     display: flex;
     align-items: center;
     gap: 6px;
-    max-width: 200px;
+    max-width: 500px;
+    /* Increased from 200px to comfortably fit 16+ dots */
     overflow-x: auto;
     scrollbar-width: none;
+    scroll-behavior: smooth;
 }
 
 .slide-indicators::-webkit-scrollbar {
