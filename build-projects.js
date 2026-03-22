@@ -35,7 +35,13 @@ Object.entries(categories).forEach(([key, folderName]) => {
         }
     }
 
-    projects.sort((a, b) => a.folder.localeCompare(b.folder));
+    // Sort projects in inverse order (highest number prefix first) — matches PHP API
+    projects.sort((a, b) => {
+        const numA = parseInt(a.folder.match(/^\d+/)) || -1;
+        const numB = parseInt(b.folder.match(/^\d+/)) || -1;
+        if (numA !== numB) return numB - numA;
+        return a.folder.localeCompare(b.folder);
+    });
     fallbackData[key] = projects;
 });
 
