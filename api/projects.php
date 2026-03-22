@@ -24,6 +24,7 @@ if (!is_dir($targetDir)) {
     exit;
 }
 
+$categoryDisabled = file_exists($targetDir . '/OFF');
 $projects = [];
 $folders = array_diff(scandir($targetDir), array('..', '.'));
 
@@ -52,9 +53,11 @@ foreach ($folders as $folder) {
         });
         
         if (!empty($validFiles)) {
+            $isProjectDisabled = $categoryDisabled || file_exists($targetDir . '/' . $folder . '/OFF');
             $projects[] = [
                 'folder' => $folder,
-                'files' => array_values($validFiles)
+                'files' => array_values($validFiles),
+                'disabled' => $isProjectDisabled
             ];
         }
     }

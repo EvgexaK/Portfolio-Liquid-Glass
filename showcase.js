@@ -83,6 +83,11 @@ function openGallery(images, startIndex, title) {
     showcaseSlides = [];
     showcaseCurrentSlide = startIndex || 0;
 
+    const viewerContainer = document.querySelector('.viewer-container');
+    if (viewerContainer) viewerContainer.classList.remove('project-disabled');
+    const disabledOverlay = document.getElementById('viewer-disabled-overlay');
+    if (disabledOverlay) disabledOverlay.style.display = 'none';
+
     showcaseTitle.textContent = title || 'Gallery';
     const disclaimer = document.getElementById('design-disclaimer');
     if (disclaimer) disclaimer.style.display = 'none';
@@ -276,6 +281,16 @@ async function selectProject(index, category) {
     document.querySelectorAll('#showcase-overlay .project-item').forEach((el, i) => {
         el.classList.toggle('active', i === index);
     });
+
+    const viewerContainer = document.querySelector('.viewer-container');
+    const disabledOverlay = document.getElementById('viewer-disabled-overlay');
+    if (project.disabled) {
+        viewerContainer.classList.add('project-disabled');
+        if (disabledOverlay) disabledOverlay.style.display = 'flex';
+    } else {
+        viewerContainer.classList.remove('project-disabled');
+        if (disabledOverlay) disabledOverlay.style.display = 'none';
+    }
 
     // Load slides (will use cache if pre-loaded)
     try {
@@ -724,7 +739,7 @@ async function preloadShowcase() {
     // Try PHP API first (production)
     for (const cat of categories) {
         try {
-            const resp = await fetch(`api/projects.php?category=${cat}`);
+            const resp = await fetch(`api/projects.php?category=${cat}&t=${Date.now()}`);
             const ct = resp.headers.get('content-type') || '';
             if (resp.ok && ct.includes('application/json')) {
                 showcasePreloadedData[cat] = await resp.json();

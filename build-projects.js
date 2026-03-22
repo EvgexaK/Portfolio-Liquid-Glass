@@ -10,6 +10,7 @@ Object.entries(categories).forEach(([key, folderName]) => {
     let projects = [];
 
     if (fs.existsSync(targetDir)) {
+        const categoryDisabled = fs.existsSync(path.join(targetDir, 'OFF'));
         const items = fs.readdirSync(targetDir, { encoding: 'utf8' });
         for (const item of items) {
             const itemPath = path.join(targetDir, item);
@@ -27,7 +28,8 @@ Object.entries(categories).forEach(([key, folderName]) => {
                 });
 
                 if (files.length > 0) {
-                    projects.push({ folder: item, files });
+                    const isProjectDisabled = categoryDisabled || fs.existsSync(path.join(itemPath, 'OFF'));
+                    projects.push({ folder: item, files, disabled: isProjectDisabled });
                 }
             }
         }
