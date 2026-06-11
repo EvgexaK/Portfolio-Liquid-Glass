@@ -1970,75 +1970,100 @@ body.nav-hidden .liquid-glass-nav {
 }
 
 .ios-alert-box {
-    width: 280px;
+    width: 320px;
     max-width: 90%;
-    background: rgba(25, 25, 25, 0.78);
-    border: 0.5px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    backdrop-filter: blur(25px) saturate(160%);
-    -webkit-backdrop-filter: blur(25px) saturate(160%);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #ffffff;
+    background: rgba(10, 10, 12, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    font-family: var(--font-primary);
+    color: var(--color-text-primary);
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    transform: scale(0.9);
-    transition: transform 0.4s cubic-bezier(0.25, 1.5, 0.5, 1);
+    
+    /* Liquid Glass Specs: chromatic aberration & reflections */
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.65),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 4px 0 8px rgba(255, 50, 50, 0.08),
+        inset -4px 0 8px rgba(0, 255, 255, 0.08);
+        
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: transform 0.6s var(--spring-bounce), opacity 0.5s ease;
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
 .ios-alert-overlay.active .ios-alert-box {
-    transform: scale(1);
+    transform: scale(1) translateY(0);
+    opacity: 1;
 }
 
 .ios-alert-body {
-    padding: 20px 16px;
+    padding: 24px 20px;
 }
 
 .ios-alert-title {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     letter-spacing: -0.2px;
+    color: var(--color-text-primary);
 }
 
 .ios-alert-text {
-    font-size: 13px;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.75);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
     letter-spacing: -0.1px;
 }
 
 .ios-alert-buttons {
     display: flex;
-    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .ios-btn {
     flex: 1;
     background: none;
     border: none;
-    padding: 12px 10px;
+    padding: 14px 10px;
     font-size: 15px;
-    color: #007af5;
     cursor: pointer;
     font-family: inherit;
     text-decoration: none;
     display: block;
     text-align: center;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
     outline: none;
 }
 
 .ios-btn:active {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .ios-btn-secondary {
-    border-right: 0.5px solid rgba(255, 255, 255, 0.15);
+    color: var(--color-text-secondary);
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ios-btn-secondary:hover {
+    color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .ios-btn-primary {
     font-weight: 600;
+    background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
+.ios-btn-primary:hover {
+    opacity: 0.85;
+    background-color: rgba(255, 255, 255, 0.03);
 }
