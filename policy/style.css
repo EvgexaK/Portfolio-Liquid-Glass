@@ -1,0 +1,223 @@
+/* ==========================================================================
+   Privacy Policy Page Styles (iOS Glassmorphism)
+   ========================================================================== */
+
+/* Page Reset Overrides */
+body {
+    overflow-y: auto !important; /* Enable normal page scrolling for the policy document */
+    height: auto !important;
+    min-height: 100vh;
+    padding-bottom: 80px;
+}
+
+#shader-bg {
+    z-index: -1; /* Keep canvas in background */
+}
+
+.gradient-bg {
+    z-index: -2;
+}
+
+/* Header & Navigation */
+.policy-header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    background: rgba(5, 5, 6, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* iOS-Style Back Button */
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #007af5;
+    text-decoration: none;
+    font-size: 17px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    transition: opacity 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-left: -8px;
+}
+
+.back-btn:hover {
+    opacity: 0.8;
+}
+
+.back-btn:active {
+    opacity: 0.5;
+}
+
+.back-icon svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Language Button Overrides for Header Placement */
+.policy-header .lang-btn {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    top: auto;
+    left: auto;
+    margin: 0 !important;
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.08);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.policy-header .lang-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.policy-header .lang-icon svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+/* Policy Content Container */
+.policy-main {
+    max-width: 1000px;
+    margin: 40px auto 0;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.policy-card {
+    background: rgba(25, 25, 30, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 48px 40px;
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    animation: fadeInCard 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes fadeInCard {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typography Details */
+.policy-content h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.policy-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 24px;
+}
+
+.policy-content section {
+    margin-bottom: 32px;
+}
+
+.policy-content h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 16px;
+    letter-spacing: -0.2px;
+}
+
+.policy-content p {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.policy-content strong {
+    color: #ffffff;
+}
+
+.policy-content ul {
+    margin-left: 20px;
+    margin-bottom: 16px;
+    color: var(--color-text-secondary);
+}
+
+.policy-content li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.policy-content a {
+    color: #007af5;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.policy-content a:hover {
+    text-decoration: underline;
+}
+
+/* Bilingual content display rules */
+body.lang-en [lang="ru"] {
+    display: none !important;
+}
+
+body.lang-ru [lang="en"] {
+    display: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .policy-main {
+        margin-top: 20px;
+        padding: 0 16px;
+    }
+    
+    .policy-card {
+        padding: 32px 20px;
+        border-radius: 16px;
+    }
+    
+    .policy-subtitle {
+        margin-bottom: 30px;
+    }
+}

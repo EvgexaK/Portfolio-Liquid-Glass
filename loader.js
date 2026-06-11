@@ -15,6 +15,7 @@
 
         setTimeout(() => {
             document.body.classList.remove('nav-hidden');
+            window.dispatchEvent(new Event('loader-finished'));
         }, 2000);
 
         setTimeout(() => {

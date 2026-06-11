@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLanguageSwitcher();
     initTimeline();
     initCategoryAnimations();
+    initCookieConsent();
 });
 
 /**
@@ -94,7 +95,11 @@ function initLanguageSwitcher() {
             "project.восточный рудник календарь": "Vostochny Mine Calendar",
             "project.руководство по оформлению": "Design Guidelines",
             "showcase.design.disclaimer": "All logos, photos, and trademarks displayed are the property of their respective owners. These works are presented for portfolio purposes only to demonstrate design capabilities and professional experience.",
-            "showcase.disabled": "Currently disabled"
+            "showcase.disabled": "Currently disabled",
+            "cookie.title": "Cookies",
+            "cookie.message": "This website uses cookies to ensure you get the best experience. By continuing to use the site, you agree to our Privacy Policy.",
+            "cookie.details": "Details",
+            "cookie.accept": "Agree"
         },
         ru: {
             "hero.line1": "Цифровой",
@@ -171,18 +176,23 @@ function initLanguageSwitcher() {
             "project.восточный рудник календарь": "Восточный рудник календарь",
             "project.руководство по оформлению": "Руководство по оформлению",
             "showcase.design.disclaimer": "Все представленные в портфолио логотипы, фотографии и товарные знаки являются собственностью их законных владельцев. Данные работы демонстрируются исключительно в целях визуализации профессионального опыта и дизайна. Все права на брендинг принадлежат соответствующим правообладателям.",
-            "showcase.disabled": "Временно недоступно"
+            "showcase.disabled": "Временно недоступно",
+            "cookie.title": "Файлы cookie",
+            "cookie.message": "Мой сайт использует файлы cookie. Продолжая работу с сайтом, вы соглашаетесь с Политикой конфиденциальности.",
+            "cookie.details": "Подробнее",
+            "cookie.accept": "Принять"
         }
     };
 
     const langBtn = document.querySelector('.lang-btn');
     const langIcon = document.querySelector('.lang-icon');
 
-    // Detect browser/system language - check if Russian
+    // Detect browser/system language or saved preference
+    const savedLang = localStorage.getItem('app-lang');
     const browserLang = navigator.language || navigator.languages?.[0] || 'en';
-    const isRussian = browserLang.toLowerCase().startsWith('ru');
+    const isRussian = savedLang ? (savedLang === 'ru') : browserLang.toLowerCase().startsWith('ru');
 
-    // Set initial language based on browser preference
+    // Set initial language
     let currentLang = isRussian ? 'ru' : 'en';
     window.currentAppLanguage = currentLang; // Expose globally for showcase.js
 
@@ -231,6 +241,7 @@ function initLanguageSwitcher() {
                 const nextLang = currentLang === 'en' ? 'ru' : 'en';
                 currentLang = nextLang;
                 window.currentAppLanguage = currentLang; // Update global state
+                localStorage.setItem('app-lang', currentLang); // Persist language choice
 
                 // Dispatch event so showcase.js can re-translate its contents if open
                 window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang: currentLang } }));
@@ -1329,4 +1340,34 @@ function initITCategory() {
     }
 
     type();
+}
+
+/**
+ * iOS-Style Cookie Consent Dialog
+ */
+function initCookieConsent() {
+    const consentAccepted = localStorage.getItem('cookie-accepted');
+    if (consentAccepted === 'true') return;
+
+    const overlay = document.getElementById('cookie-consent-overlay');
+    const acceptBtn = document.getElementById('cookie-accept-btn');
+    if (!overlay || !acceptBtn) return;
+
+    // Show popup 500ms after the loader pre-roll ends
+    window.addEventListener('loader-finished', () => {
+        setTimeout(() => {
+            overlay.style.display = 'flex';
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+        }, 500);
+    });
+
+    acceptBtn.addEventListener('click', () => {
+        overlay.classList.remove('active');
+        localStorage.setItem('cookie-accepted', 'true');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 400); // matches transition time
+    });
 }
